@@ -23,3 +23,7 @@ B) FEATURE FOR RESTAURANT MANAGER
 ADDITIONAL FEATURES FOR OUR PROJECT
 To be confirmed.
 """
+
+# TODO Start developing design of the application
+# TODO Start implementing the application part by part
+# TODO Test the application to make sure run smoothly without errors 
