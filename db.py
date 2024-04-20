@@ -1,6 +1,6 @@
 """
 Program: db.py
-Author: Khilfi
+Author: Khilfi, Murfiqah, Zainatul
 Perform database operations for reading, and saving data from all text file.
 """
 import datetime as dt
@@ -53,20 +53,43 @@ def saveOrders(orders: list[dict]):
     file.write(raw_data)
 
 
+def saveStock(stocks):
+    file = open("products.txt", 'w')
+    file.write("id,name,price,unit,sold\n")
+    for stock in stocks:
+        file.write("{},{},{},{},{}\n".format(stock["company"], stock["product"], stock["price"], stock["unit"], stock["sold"]))
+    file.close()
+
+
+def loadProducts():
+    file = open('products.txt', 'r')
+    next(file)  # Skip data header
+    stocks = []
+    for line in file:
+        company, product, price, unit, sold = line.strip().split(",")
+        stocks.append({
+            "company": company,
+            "product": product,
+            "price": float(price),
+            "unit": int(unit),
+            "sold": int(sold)
+        })
+    file.close()
+    return stocks
+
 
 if __name__ == "__main__":
-  print("TEST 1")
+  print("\nTEST 1: Load orders")
   orders = loadOrders()
   print(orders)
-  print("TEST 2")
-  orders.append({
-    "id": "3",
-    "userId": "10",
-    "address": "INTEC Education College",
-    "datetime": "2024",
-    "status": False,
-    "totalPrice": 10.00,
-    "products": [{"id": "4", "price": 10.00, "quantity": 1}]
 
-  })
+  print("\nTEST 2: Save orders (Refer orders.txt for output)")
   saveOrders(orders)
+
+  print("\nTEST 3: Load products")
+  overallProducts = loadProducts()
+  for product in overallProducts:
+      print(product)
+
+  print("\nTEST 4: Save products (Refer products.txt for output)")
+  saveStock(overallProducts)
