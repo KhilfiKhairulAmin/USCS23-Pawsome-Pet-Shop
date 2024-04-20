@@ -60,7 +60,7 @@ def saveStock(stocks):
     file.close()
 
 
-def loadProducts():
+def loadStocks():
     file = open('db/products.txt', 'r')
     next(file)  # Skip data header
     stocks = []
@@ -86,9 +86,9 @@ if __name__ == "__main__":
   saveOrders(orders)
 
   print("\nTEST 3: Load products")
-  overallProducts = loadProducts()
-  for product in overallProducts:
-      print(product)
+  overallStocks = loadStocks()
+  for stock in overallStocks:
+      print(stock)
 
   print("\nTEST 4: Save products (Refer products.txt for output)")
-  saveStock(overallProducts)
+  saveStock(overallStocks)
