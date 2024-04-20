@@ -53,22 +53,24 @@ def saveOrders(orders: list[dict]):
 
 
 def saveStock(stocks):
-    file = open("db/products.txt", 'w')
-    file.write("id,name,price,unit,sold\n")
+    file = open("db/stocks.txt", 'w')
+    file.write("id,imageId,company,name,price,unit,sold\n")
     for stock in stocks:
-        file.write("{},{},{},{},{}\n".format(stock["company"], stock["product"], stock["price"], stock["unit"], stock["sold"]))
+        file.write("{},{},{},{},{},{},{}\n".format(stock["id"], stock["imageId"], stock["company"], stock["name"], stock["price"], stock["unit"], stock["sold"]))
     file.close()
 
 
 def loadStocks():
-    file = open('db/products.txt', 'r')
+    file = open('db/stocks.txt', 'r')
     next(file)  # Skip data header
     stocks = []
     for line in file:
-        company, product, price, unit, sold = line.strip().split(",")
+        id_, imageId, company, name, price, unit, sold = line.strip().split(",")
         stocks.append({
+            "id": id_,
+            "imageId": imageId,
             "company": company,
-            "product": product,
+            "name": name,
             "price": float(price),
             "unit": int(unit),
             "sold": int(sold)
