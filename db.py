@@ -3,7 +3,7 @@ Program: db.py
 Author: Khilfi, Murfiqah, Zainatul
 Perform database operations for reading, and saving data from all text file.
 """
-
+print("Hello world!")
 
 def loadOrders():
   orders: list[dict] = []
