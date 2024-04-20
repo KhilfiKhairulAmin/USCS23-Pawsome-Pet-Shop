@@ -52,31 +52,55 @@ def saveOrders(orders: list[dict]):
     file.write(raw_data)
 
 
-def saveStock(stocks):
-    file = open("db/stocks.txt", 'w')
-    file.write("id,imageId,company,name,price,unit,sold\n")
-    for stock in stocks:
-        file.write("{},{},{},{},{},{},{}\n".format(stock["id"], stock["imageId"], stock["company"], stock["name"], stock["price"], stock["unit"], stock["sold"]))
-    file.close()
+def saveProducts(stocks):
+  file = open("db/products.txt", 'w')
+  file.write("id,imageId,company,name,price,unit,sold\n")
+  for stock in stocks:
+    file.write("{},{},{},{},{},{},{}\n".format(stock["id"], stock["imageId"], stock["company"], stock["name"], stock["price"], stock["unit"], stock["sold"]))
+  file.close()
 
 
-def loadStocks():
-    file = open('db/stocks.txt', 'r')
-    next(file)  # Skip data header
-    stocks = []
+def loadProducts():
+  file = open('db/products.txt', 'r')
+  next(file)  # Skip data header
+  stocks = []
+  for line in file:
+    id_, imageId, company, name, price, unit, sold = line.strip().split(",")
+    stocks.append({
+        "id": id_,
+        "imageId": imageId,
+        "company": company,
+        "name": name,
+        "price": float(price),
+        "unit": int(unit),
+        "sold": int(sold)
+    })
+  file.close()
+  return stocks
+
+
+def loadUsers():
+  users = []
+  with open('db/users.txt', 'r') as file:
+    next(file)
     for line in file:
-        id_, imageId, company, name, price, unit, sold = line.strip().split(",")
-        stocks.append({
-            "id": id_,
-            "imageId": imageId,
-            "company": company,
-            "name": name,
-            "price": float(price),
-            "unit": int(unit),
-            "sold": int(sold)
-        })
-    file.close()
-    return stocks
+      id_, username, password = line.split(',')
+      users.append({
+          "id": id_,
+          "username": username,
+          "password": password,
+      })
+  return users
+
+
+def saveUsers(users):
+  header = "id,username,password"
+  raw_data = header + '\n'
+  for user in users:
+    raw_data += f"{user['id']},{user['username']},{user['password']}"
+  
+  with open('db/users.txt', 'w') as file:
+    file.write(raw_data)
 
 
 if __name__ == "__main__":
@@ -88,9 +112,16 @@ if __name__ == "__main__":
   saveOrders(orders)
 
   print("\nTEST 3: Load products")
-  overallStocks = loadStocks()
-  for stock in overallStocks:
-      print(stock)
+  overallProducts = loadProducts()
+  for product in overallProducts:
+      print(product)
 
   print("\nTEST 4: Save products (Refer products.txt for output)")
-  saveStock(overallStocks)
+  saveProducts(overallProducts)
+
+  print("\nTEST 5: loadUsers")
+  users = loadUsers()
+  print(users)
+
+  print("\nTEST 6: saveUsers (Refer users.txt for output)")
+  saveUsers(users)
