@@ -1,6 +1,4 @@
 from PIL import Image
-
-
 def shrink_image(file):
   img = Image.open(file)
   img = img.resize((50, 50))

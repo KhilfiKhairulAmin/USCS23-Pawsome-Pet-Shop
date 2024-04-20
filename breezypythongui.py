@@ -1,5 +1,5 @@
 """
-File: breezypythongui.py
+
 Version: 1.2
 Copyright 2012, 2013, 2019 by Ken Lambert
 
