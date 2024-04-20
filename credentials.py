@@ -1,0 +1,1 @@
+CREDENTIALS = [{'username': 'murfiqah', 'password': '2312'}, {'username': 'khilfi', 'password': '123'}, {'username': 'zainatul', 'password': '4321'}, {'username': 'iyas', 'password': '9999'}, {'username': 'yasmin', 'password': '8888'}, {'username': 'alya', 'password': '4567'}]
