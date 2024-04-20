@@ -3,12 +3,11 @@ Program: db.py
 Author: Khilfi, Murfiqah, Zainatul
 Perform database operations for reading, and saving data from all text file.
 """
-import datetime as dt
 
 
 def loadOrders():
   orders: list[dict] = []
-  with open('orders.txt') as file:
+  with open('db/orders.txt') as file:
     next(file)  # Skip data header
     for line in file:
       (id, userId, address, datetime, status, totalPrice, *products_) = line.split(',')  
@@ -49,12 +48,12 @@ def saveOrders(orders: list[dict]):
         raw_data += f',{v.pop(0)},{v.pop(0)},{v.pop(0)}'
     raw_data += '\n'
 
-  with open('orders.txt', 'w') as file:
+  with open('db/orders.txt', 'w') as file:
     file.write(raw_data)
 
 
 def saveStock(stocks):
-    file = open("products.txt", 'w')
+    file = open("db/products.txt", 'w')
     file.write("id,name,price,unit,sold\n")
     for stock in stocks:
         file.write("{},{},{},{},{}\n".format(stock["company"], stock["product"], stock["price"], stock["unit"], stock["sold"]))
@@ -62,7 +61,7 @@ def saveStock(stocks):
 
 
 def loadProducts():
-    file = open('products.txt', 'r')
+    file = open('db/products.txt', 'r')
     next(file)  # Skip data header
     stocks = []
     for line in file:
