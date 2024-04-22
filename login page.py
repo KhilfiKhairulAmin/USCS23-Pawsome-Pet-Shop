@@ -1,7 +1,9 @@
 from tkinter import *
 from tkinter import messagebox
-from credentials import CREDENTIALS
+from db import loadUsers, saveUsers
 
+
+# Use tk
 show = Tk()
 
 #screen
@@ -10,22 +12,25 @@ show.geometry('1000x600+300+200')
 show.configure(bg="white")
 show.resizable(False,False)
 
+# Fetch user data from text file
+Users = loadUsers()
 
 #signup
 def signin():
+    global user
     username=user.get()
     password=passw.get()
 
-    valid_credentials = False
-    for cred in CREDENTIALS:
-        if cred["username"] == username and cred["password"] == password:
-            valid_credentials = True
+    valid_Users = False
+    for user in Users:
+        if user["username"] == username and user["password"] == password:
+            valid_Users = True
             break
 
-    if valid_credentials:
+    if valid_Users:
         show.destroy()
         #app
-        screen=Toplevel()
+        screen=Tk()
         screen.title("App")
         screen.geometry("925x500+300+200")
         screen.config(bg="white")
@@ -56,10 +61,9 @@ def signup_command():
         cpassword=cpassw.get()
 
         if password==cpassword:
-            CREDENTIALS.append({"username": username, "password": password})
-        
-            with open("credentials.py", "w") as file:
-                file.write(f"CREDENTIALS = {CREDENTIALS}")
+            new_id = int(Users[-1]["id"]) + 1
+            Users.append({"username": username, "password": password, "id": str(new_id)})
+            saveUsers(Users)
             messagebox.showinfo("Success","New user signed up successfully!")
 
         else:
@@ -78,14 +82,14 @@ def signup_command():
     #username
     def on_enter(e):
         user.delete(0,'end')
-    
+
     def on_leave(e):
         name=user.get()
         if name=='':
-             user.insert(0,'Username')
-         
+                user.insert(0,'Username')
+            
     user = Entry(frame,width=25,fg="black",bg="white",\
-             font=('Microsoft YaHei UI Light',11))
+                font=('Microsoft YaHei UI Light',11))
     user.place(x=30,y=120)
     user.insert(0,'Username')
     user.bind('<FocusIn>',on_enter)
@@ -100,10 +104,10 @@ def signup_command():
     def on_leave(e):
         name=passw.get()
         if name=='':
-             passw.insert(0,'Password')
-         
+                passw.insert(0,'Password')
+            
     passw = Entry(frame,width=25,fg="black",bg="white",\
-             font=('Microsoft YaHei UI Light',11))
+                font=('Microsoft YaHei UI Light',11))
     passw.place(x=30,y=210)
     passw.insert(0,'Password')
     passw.bind('<FocusIn>',on_enter)
@@ -118,7 +122,7 @@ def signup_command():
     def on_leave(e):
         name=cpassw.get()
         if name=='':
-             cpassw.insert(0,'Confirm Password')
+                cpassw.insert(0,'Confirm Password')
          
     cpassw = Entry(frame,width=25,fg="black",bg="white",\
                    font=('Microsoft YaHei UI Light',11))
