@@ -3,8 +3,8 @@ Program: db.py
 Author: Khilfi, Murfiqah, Zainatul
 Perform database operations for reading, and saving data from all text file.
 """
-print("Hello world!")
-print("Hello 2")
+
+
 def loadOrders():
   orders: list[dict] = []
   with open('db/orders.txt') as file:
