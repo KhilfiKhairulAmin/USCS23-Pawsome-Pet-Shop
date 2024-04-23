@@ -97,10 +97,10 @@ def saveUsers(users):
   header = "id,username,password"
   raw_data = header + '\n'
   for user in users:
-    raw_data += f"{user['id']},{user['username']},{user['password']}"
+    raw_data += f"{user['id']},{user['username']},{user['password'].strip()}\n"
   
   with open('db/users.txt', 'w') as file:
-    file.write(raw_data+"\n")
+    file.write(raw_data)
 
 
 if __name__ == "__main__":
