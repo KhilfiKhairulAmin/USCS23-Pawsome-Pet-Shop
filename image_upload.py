@@ -48,7 +48,7 @@ class ImageUpload(EasyFrame):
     # Filter out only the directories from the list
     directories = [item for item in files_and_directories if os.path.isdir(os.path.join(directory_path, item))]
     directories.remove("[imageId]")
-    return int(max(directories))+1
+    return max([int(x) for x in directories])+1
 
 
 if __name__ == "__main__":
