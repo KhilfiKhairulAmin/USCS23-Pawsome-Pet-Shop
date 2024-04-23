@@ -38,7 +38,7 @@ class ProductManagement(EasyFrame, tk.Toplevel):
     for i in range(start_row, start_row + len(self.items)):
       item = self.items[i-start_row]
       self.addLabel(item["id"], row=i, column=0, sticky="NSEW")
-      img = tk.PhotoImage(file=f"images/{item['imageId']}/original.png", height=50, width=50)
+      img = tk.PhotoImage(file=f"images/{item['imageId']}/50x50.png", height=50, width=50)
       img_label = self.addLabel("", row=i, column=1, sticky="NSEW")
       img_label["image"] = img
       self.imgs.append(img)
