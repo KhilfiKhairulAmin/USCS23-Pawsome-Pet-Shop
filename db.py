@@ -22,7 +22,7 @@ def loadOrders():
           "quantity": int(products_[i])
         })
         i += 3
-
+      
       orders.append({
         "id": id,
         "userId": userId,
@@ -30,7 +30,16 @@ def loadOrders():
         "datetime": datetime,
         "status": True if status == "True" else False,
         "totalPrice": float(totalPrice),
-        "products": products
+        "products": [
+          {
+            "id": "1",
+            "price": 10.0
+          },
+          {
+            "id": "2",
+            "price": 1
+          }
+        ]
       })
   
   return orders
