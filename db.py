@@ -54,7 +54,7 @@ def saveOrders(orders: list[dict]):
     for product in order["products"]:
       v = list(product.values())
       while len(v) > 0:
-        raw_data += f',{v.pop(0)},{v.pop(0)},{v.pop(0)}'
+        raw_data += f',{v.pop(0)},{v.pop(0)}'
     raw_data += '\n'
 
   with open('db/orders.txt', 'w') as file:
