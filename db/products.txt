@@ -1,3 +1,4 @@
-id,imageId,company,name,price,unit,sold
-1,1,Royal Canin,Sensitivity Control Wet Food (85g x 12 pouches),67.5,10,2
-2,2,Whiskas,Classic Selection Wet Food in Sauce,40.28,2,0
+id,imageId,name,price,unit,sold
+1,26,Minecraft,100.0,2,2
+2,4,Classic Selection Wet Food in Sauce ok,40.28,2,0
+3,28,Super Duper car food,0.0,0,0
