@@ -8,6 +8,7 @@ import time
 
 
 products = loadProducts()
+font = ("Verdana", 11)
 
 
 class ManagerDashboard(EasyFrame):
@@ -25,44 +26,83 @@ class ProductManagement(EasyFrame):
   def __init__(self):
     EasyFrame.__init__(self, "Product Manager")
 
+    self.imgs = []  # used to store images reference because if not stored, it will get destroyed from memory
+    self.shopLogo = self.addLabel("", row=0, column=0, columnspan=8, sticky="NSEW")
+    logo = tk.PhotoImage(file="cat logo375x375.jpg")
+    self.shopLogo["image"] = logo
+    self.imgs.append(logo)
+
+    # Add button
+    self.addButton("Add Product", row=1, column=0, columnspan=8, command=self.add).config(font=font, background="#ee9b61", activebackground="white")
+
+    if len(products) == 0:
+      self.addLabel("No products yet. Add new product by pressing the button.", 1, 0, columnspan=7)
+      return
+
     # Table headers
-    self.addLabel("ID", row=1, column=0, sticky="NSEW", font=("Verdana", 10))
-    self.addLabel("Image", row=1, column=1, sticky="NSEW", font=("Verdana", 10))
-    self.addLabel("Item Name", row=1, column=2, sticky="NSEW", font=("Verdana", 10))
-    self.addLabel("Price (RM)", row=1, column=3, sticky="NSEW", font=("Verdana", 10))
-    self.addLabel("Unit", row=1, column=4, sticky="NSEW", font=("Verdana", 10))
-    self.addLabel("Sold Unit", row=1, column=5, sticky="NSEW", font=("Verdana", 10))
-    self.addLabel("Actions", row=1, column=6, columnspan=2, sticky="NSEW", font=("Verdana", 10))
+    self.addLabel("ID", row=2, column=0, sticky="NSEW", font=font)
+    self.addLabel("Image", row=2, column=1, sticky="NSEW", font=font)
+    self.addLabel("Item Name", row=2, column=2, sticky="NSEW", font=font)
+    self.addLabel("Price (RM)", row=2, column=3, sticky="NSEW", font=font)
+    self.addLabel("Unit", row=2, column=4, sticky="NSEW", font=font)
+    self.addLabel("Sold Unit", row=2, column=5, sticky="NSEW", font=font)
+    self.addLabel("Actions", row=2, column=6, columnspan=2, sticky="NSEW", font=font)
 
     # Display each column of data in the table row-by-row
-    self.imgs = []  # used to store images reference because if not stored, it will get destroyed from memory
-    self.start_row = 2
+    self.start_row = 3
     self.shift_amount = 0
+    background_picker = lambda n: "#f3c59d" if n % 2 == 0 else "#ee9b62"
     for i in range(self.start_row, self.start_row + len(products)):
+      bg = background_picker(i-self.start_row)
       product: dict = products[i-self.start_row]
-      self.addLabel(product["id"], row=i, column=0, sticky="NSEW")
+      self.addLabel(product["id"], row=i, column=0, sticky="NSEW", background=bg)
       img = tk.PhotoImage(file=f"images/{product['imageId']}/50x50.png", height=50, width=50)
       img_label = self.addLabel("", row=i, column=1, sticky="NSEW")
       img_label["image"] = img
       self.imgs.append(img)
-      self.addLabel(product["name"], row=i, column=2, sticky="NSEW")
-      self.addLabel("%.2f" % product["price"], row=i, column=3, sticky="NSEW")
-      self.addLabel(product["unit"], row=i, column=4, sticky="NSEW")
-      self.addLabel(product["sold"], row=i, column=5, sticky="NSEW")
-      self.addButton("Edit", row=i, column=6, command=lambda pos=i-self.start_row: self.edit(pos))
-    self.addLabel("hello world", 0,0)
+      self.addLabel(product["name"], row=i, column=2, sticky="NSEW", font=font, background=bg)
+      self.addLabel("%.2f" % product["price"], row=i, column=3, sticky="NSEW", font=font, background=bg)
+      self.addLabel(product["unit"], row=i, column=4, sticky="NSEW", font=font, background=bg)
+      self.addLabel(product["sold"], row=i, column=5, sticky="NSEW", font=font, background=bg)
+      self.addButton("Edit", row=i, column=6, command=lambda pos=i-self.start_row: self.edit(pos)).configure(font=font, background=bg)
+      self.addButton("Delete", row=i, column=7, command=lambda pos=i-self.start_row: self.delete(pos)).configure(font=font, background=bg)
 
   def edit(self, pos):
     ProductEditMenu(self, pos)
 
+  def add(self):
+    ProductEditMenu(self, len(products)+1)
+
+  def delete(self, pos):
+    def deleteProduct(pos):
+      products.pop(pos)
+      saveProducts(products)
+      self.master.destroy()
+      ProductManagement().mainloop()
+
+    Modal("Delete Product", lambda pos=pos: deleteProduct(pos))
+
 
 class ProductEditMenu(EasyFrame, tk.Toplevel):
   def __init__(self, parent, pos):
-    # Get product at position `pos`
-    product = products[pos]
+    title = "Add Product"
+    try:
+      # Get product at position `pos`
+      product = products[pos]
+      title = f"Edit Product#{product['id']}"
+    except IndexError:
+      # For add new product
+      product = {
+        "id": str(pos),
+        "imageId": "",
+        "name": "",
+        "price": 0,
+        "unit": 0,
+        "sold": 0
+      }
 
     # Init window
-    EasyFrame.__init__(self, f"Edit Product#{product['id']}")
+    EasyFrame.__init__(self, title)
     tk.Toplevel.__init__(self)
 
     # Store position, item, parent, and image
@@ -73,7 +113,11 @@ class ProductEditMenu(EasyFrame, tk.Toplevel):
 
     # Product image
     self.editImage = self.addLabel("", row=0, column=0, sticky="NSEW")
-    img = tk.PhotoImage(file=f"images/{product['imageId']}/200x200.png", width=200, height=200)
+    try:
+      img = tk.PhotoImage(file=f"images/{product['imageId']}/200x200.png", width=200, height=200)
+    except:
+      img = ""
+
     self.editImage["image"] = img
     self.img_temp.append(img)
     self.uploadButton = self.addButton("Upload Image", row=1, column=0, columnspan=2, command=self.uploadImage)
@@ -89,7 +133,7 @@ class ProductEditMenu(EasyFrame, tk.Toplevel):
 
     # Product price
     self.addLabel("Price (RM)", row=6, column=0)
-    self.editPrice = self.addFloatField(product["price"], row=7, column=0, precision=2, sticky="W")
+    self.editPrice = self.addFloatField("%.2f" % product["price"], row=7, column=0, precision=2, sticky="W")
 
     # Product unit
     self.addLabel("Unit", row=8, column=0)
@@ -110,15 +154,16 @@ class ProductEditMenu(EasyFrame, tk.Toplevel):
     
     self.newImagePath = filePath
     
+    # Create temporary image for review purpose
     with Image.open(filePath) as tempImg:
       # Store image temporarily under `temp` folder
       tempImg = tempImg.resize((200, 200))
       tempFile = f"temp/{time.time()}.png"
       tempImg.save(tempFile)
 
-    self.reviewImg = self.addLabel("", row=0, column=1)
-    self.tempImg = tk.PhotoImage(tempFile, width=200, height=200)
-    self.reviewImg["image"] = self.tempImg
+    # Replace picture
+    tempImg = tk.PhotoImage(file=tempFile, width=200, height=200)
+    self.editImage["image"] = tempImg
     self.img_temp.append(tempImg)
     self.uploadButton["state"] = "disabled"
 
@@ -175,12 +220,28 @@ class ProductEditMenu(EasyFrame, tk.Toplevel):
         img_3.save(f"images/{newImageId}/50x50.png")
 
       self.item["imageId"] = newImageId
+    elif self.item["imageId"] == "":
+      self.messageBox("Invalid Image", message="Please upload an image for this product")
+      return
     
     # Save the new update
-    products[self.pos] = self.item
+    try:
+      products[self.pos] = self.item
+    except IndexError:
+      products.append(self.item)
     saveProducts(products)
     self.parent.master.destroy()
     ProductManagement().mainloop()
+
+
+class Modal(EasyFrame, tk.Toplevel):
+  def __init__(self, title="", command=lambda : None):
+    EasyFrame.__init__(self, title)
+    tk.Toplevel.__init__(self)
+    self.addLabel("Are you sure?", 0, 0, columnspan=2)
+    self.addButton("Cancel", 1, 0)
+    self.addButton("Yes", 1, 1, command=command)
+
 
 def main():
   ManagerDashboard().mainloop()
