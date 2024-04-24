@@ -83,9 +83,11 @@ def main():
     productFile = "products.txt"
     products = loadProducts()
     orders = loadOrders()
-    cart = ShoppingCart()
+    root = Tk()
+    cart = ShoppingCart(root)
 
     saveOrders(orders)
+    root.mainloop()
 
 if __name__ == "__main__":
     main()
