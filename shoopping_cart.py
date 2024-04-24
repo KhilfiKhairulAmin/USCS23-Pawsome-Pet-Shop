@@ -4,7 +4,7 @@ class shoppingCart:
     def __init__(self):
         self.items = {}
 
-    def addItem(self, id, quantity=1):
+    def addItem(self, id, quantity=1): #kena add button 
         with open("products.txt", 'r') as file:
             next(file)
             for line in file:
@@ -15,18 +15,18 @@ class shoppingCart:
                     "quantity": quantity
                 }
 
-    def calculateTotal(self):
+    def calculateTotal(self): 
         total = sum(item["price"] * item["quantity"] for item in self.items.values())
         return total
 
-    def displayCart(self):
+    def displayCart(self): # kena add button 
         print("Your cart:")
         for id, item_info in self.items.items():
             print(f"Item ID: {id}, Name: {item_info['name']}, Price: ${item_info['price']}, Quantity: {item_info['quantity']}")
         print(f"Total items: {sum(item['quantity'] for item in self.items.values())}")
         print(f"Total price: ${self.calculateTotal()}")
 
-    def removeItem(self, id, quantity=1):
+    def removeItem(self, id, quantity=1): #kena add button 
         if id in self.items:
             if self.items[id]['quantity'] <= quantity:
                 del self.items[id]
@@ -35,7 +35,7 @@ class shoppingCart:
         else:
             print("Item not found in cart.")
 
-    def receipt(self):
+    def receipt(self): #kena add button 
         top = Toplevel()
         top.geometry("400x150")
         top.config(background="sky blue")
@@ -61,15 +61,19 @@ class shoppingCart:
         headingLabel.pack()
         headingLabel.config(background="white")
 
+#payment method - radio button 
+
 def main():
     productFile = "products.txt"
     cart = shoppingCart()
 
-    cart.addItem("1", 2)  # Example of adding item with ID "1" and quantity 2
+    cart.addItem("1", 2)  #example of adding item with ID "1" and quantity 2
     cart.displayCart()
-    cart.removeItem("1")  # Example of removing item with ID "1"
+    cart.removeItem("1")  #example of removing item with ID "1"
     cart.displayCart()
     cart.receipt()
+
+
 
 if __name__ == "__main__":
     main()
