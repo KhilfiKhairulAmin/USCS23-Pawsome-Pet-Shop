@@ -7,7 +7,7 @@ import os
 import time
 
 
-items = loadProducts()
+products = loadProducts()
 
 
 class ManagerDashboard(EasyFrame):
@@ -35,54 +35,45 @@ class ProductManagement(EasyFrame):
     self.addLabel("Actions", row=1, column=6, columnspan=2, sticky="NSEW", font=("Verdana", 10))
 
     # Display each column of data in the table row-by-row
-    self.imgs = []  # used to store images reference because if not stored, it will get destroyed at the end of the for loop
+    self.imgs = []  # used to store images reference because if not stored, it will get destroyed from memory
     self.start_row = 2
     self.shift_amount = 0
-    for i in range(self.start_row, self.start_row + len(items)):
-      item: dict = items[i-self.start_row]
-      self.addLabel(item["id"], row=i, column=0, sticky="NSEW")
-      img = tk.PhotoImage(file=f"images/{item['imageId']}/50x50.png", height=50, width=50)
+    for i in range(self.start_row, self.start_row + len(products)):
+      product: dict = products[i-self.start_row]
+      self.addLabel(product["id"], row=i, column=0, sticky="NSEW")
+      img = tk.PhotoImage(file=f"images/{product['imageId']}/50x50.png", height=50, width=50)
       img_label = self.addLabel("", row=i, column=1, sticky="NSEW")
       img_label["image"] = img
       self.imgs.append(img)
-      self.addLabel(item["name"], row=i, column=2, sticky="NSEW")
-      self.addLabel("%.2f" % item["price"], row=i, column=3, sticky="NSEW")
-      self.addLabel(item["unit"], row=i, column=4, sticky="NSEW")
-      self.addLabel(item["sold"], row=i, column=5, sticky="NSEW")
+      self.addLabel(product["name"], row=i, column=2, sticky="NSEW")
+      self.addLabel("%.2f" % product["price"], row=i, column=3, sticky="NSEW")
+      self.addLabel(product["unit"], row=i, column=4, sticky="NSEW")
+      self.addLabel(product["sold"], row=i, column=5, sticky="NSEW")
       self.addButton("Edit", row=i, column=6, command=lambda pos=i-self.start_row: self.edit(pos))
     self.addLabel("hello world", 0,0)
 
-  def edit(self, item):
-    ProductEditForm(self, item)
-
-  def uploadImage(self, i):
-    pass
-
-  def add(self):
-    pass
-
-  def delete(self):
-    pass
+  def edit(self, pos):
+    ProductEditMenu(self, pos)
 
 
-class ProductEditForm(EasyFrame, tk.Toplevel):
+class ProductEditMenu(EasyFrame, tk.Toplevel):
   def __init__(self, parent, pos):
-    # Get an item from position `pos`
-    item = items[pos]
+    # Get product at position `pos`
+    product = products[pos]
 
-    # Init indow
-    EasyFrame.__init__(self, f"Edit Product#{item['id']}")
+    # Init window
+    EasyFrame.__init__(self, f"Edit Product#{product['id']}")
     tk.Toplevel.__init__(self)
 
     # Store position, item, parent, and image
     self.pos = pos
-    self.item = item
+    self.item = product
     self.parent = parent
     self.img_temp = []
 
     # Product image
     self.editImage = self.addLabel("", row=0, column=0, sticky="NSEW")
-    img = tk.PhotoImage(file=f"images/{item['imageId']}/200x200.png", width=200, height=200)
+    img = tk.PhotoImage(file=f"images/{product['imageId']}/200x200.png", width=200, height=200)
     self.editImage["image"] = img
     self.img_temp.append(img)
     self.uploadButton = self.addButton("Upload Image", row=1, column=0, columnspan=2, command=self.uploadImage)
@@ -90,19 +81,19 @@ class ProductEditForm(EasyFrame, tk.Toplevel):
 
     # Product ID
     self.addLabel("Product ID", row=2, column=0)
-    self.editId = self.addTextField(item["id"], row=3, column=0, sticky="W", state="disabled", width=5)
+    self.editId = self.addTextField(product["id"], row=3, column=0, sticky="W", state="disabled", width=5)
 
     # Product name
     self.addLabel("Name", row=4, column=0)
-    self.editName = self.addTextField(item["name"], row=5, column=0, width=50, sticky="W")
+    self.editName = self.addTextField(product["name"], row=5, column=0, width=50, sticky="W")
 
     # Product price
     self.addLabel("Price (RM)", row=6, column=0)
-    self.editPrice = self.addFloatField(item["price"], row=7, column=0, precision=2, sticky="W")
+    self.editPrice = self.addFloatField(product["price"], row=7, column=0, precision=2, sticky="W")
 
     # Product unit
     self.addLabel("Unit", row=8, column=0)
-    self.editUnit = self.addIntegerField(item["unit"], row=9, column=0, sticky="W")
+    self.editUnit = self.addIntegerField(product["unit"], row=9, column=0, sticky="W")
 
     # Save Button
     self.save = self.addButton("Save", row=10, column=0, command=self.save)
@@ -185,8 +176,8 @@ class ProductEditForm(EasyFrame, tk.Toplevel):
       self.item["imageId"] = newImageId
     
     # Save the new update
-    items[self.pos] = self.item
-    saveProducts(items)
+    products[self.pos] = self.item
+    saveProducts(products)
     self.parent.master.destroy()
     ProductManagement().mainloop()
 
