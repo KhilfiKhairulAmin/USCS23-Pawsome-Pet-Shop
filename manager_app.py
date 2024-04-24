@@ -1,9 +1,13 @@
 from breezypythongui import EasyFrame
 import tkinter as tk
-from db import loadOrders, loadProducts
+import tkinter.filedialog
+from PIL import Image
+from db import loadProducts, saveProducts
+import os
+import time
 
 
-items = loadOrders()
+items = loadProducts()
 
 
 class ManagerDashboard(EasyFrame):
@@ -12,16 +16,14 @@ class ManagerDashboard(EasyFrame):
     self.addButton("Manage Products", 0, 0, command=self.manageProducts)
 
   def manageProducts(self):
-    ProductManagement()
+    self.master.destroy()
+    ProductManagement().mainloop()
 
 
-class ProductManagement(EasyFrame, tk.Toplevel):
+class ProductManagement(EasyFrame):
   
   def __init__(self):
     EasyFrame.__init__(self, "Product Manager")
-    tk.Toplevel.__init__(self)
-
-    self.items = loadProducts()
 
     # Table headers
     self.addLabel("ID", row=1, column=0, sticky="NSEW", font=("Verdana", 10))
@@ -34,9 +36,10 @@ class ProductManagement(EasyFrame, tk.Toplevel):
 
     # Display each column of data in the table row-by-row
     self.imgs = []  # used to store images reference because if not stored, it will get destroyed at the end of the for loop
-    start_row = 2
-    for i in range(start_row, start_row + len(self.items)):
-      item = self.items[i-start_row]
+    self.start_row = 2
+    self.shift_amount = 0
+    for i in range(self.start_row, self.start_row + len(items)):
+      item: dict = items[i-self.start_row]
       self.addLabel(item["id"], row=i, column=0, sticky="NSEW")
       img = tk.PhotoImage(file=f"images/{item['imageId']}/50x50.png", height=50, width=50)
       img_label = self.addLabel("", row=i, column=1, sticky="NSEW")
@@ -46,11 +49,13 @@ class ProductManagement(EasyFrame, tk.Toplevel):
       self.addLabel("%.2f" % item["price"], row=i, column=3, sticky="NSEW")
       self.addLabel(item["unit"], row=i, column=4, sticky="NSEW")
       self.addLabel(item["sold"], row=i, column=5, sticky="NSEW")
-      self.addButton("Edit", row=i, column=6, command=lambda: self.edit(i))
-
+      self.addButton("Edit", row=i, column=6, command=lambda pos=i-self.start_row: self.edit(pos))
     self.addLabel("hello world", 0,0)
 
-  def edit(self, i):
+  def edit(self, item):
+    ProductEditForm(self, item)
+
+  def uploadImage(self, i):
     pass
 
   def add(self):
@@ -59,6 +64,131 @@ class ProductManagement(EasyFrame, tk.Toplevel):
   def delete(self):
     pass
 
+
+class ProductEditForm(EasyFrame, tk.Toplevel):
+  def __init__(self, parent, pos):
+    # Get an item from position `pos`
+    item = items[pos]
+
+    # Init indow
+    EasyFrame.__init__(self, f"Edit Product#{item['id']}")
+    tk.Toplevel.__init__(self)
+
+    # Store position, item, parent, and image
+    self.pos = pos
+    self.item = item
+    self.parent = parent
+    self.img_temp = []
+
+    # Product image
+    self.editImage = self.addLabel("", row=0, column=0, sticky="NSEW")
+    img = tk.PhotoImage(file=f"images/{item['imageId']}/200x200.png", width=200, height=200)
+    self.editImage["image"] = img
+    self.img_temp.append(img)
+    self.uploadButton = self.addButton("Upload Image", row=1, column=0, columnspan=2, command=self.uploadImage)
+    self.newImagePath = ""
+
+    # Product ID
+    self.addLabel("Product ID", row=2, column=0)
+    self.editId = self.addTextField(item["id"], row=3, column=0, sticky="W", state="disabled", width=5)
+
+    # Product name
+    self.addLabel("Name", row=4, column=0)
+    self.editName = self.addTextField(item["name"], row=5, column=0, width=50, sticky="W")
+
+    # Product price
+    self.addLabel("Price (RM)", row=6, column=0)
+    self.editPrice = self.addFloatField(item["price"], row=7, column=0, precision=2, sticky="W")
+
+    # Product unit
+    self.addLabel("Unit", row=8, column=0)
+    self.editUnit = self.addIntegerField(item["unit"], row=9, column=0, sticky="W")
+
+    # Save Button
+    self.save = self.addButton("Save", row=10, column=0, command=self.save)
+
+  def uploadImage(self):
+    # Get image file
+    fList = [("Image files", "*.png;*.jpg;*.jpeg;*.gif")]
+    filePath = tkinter.filedialog.askopenfilename(parent = self, filetypes = fList)
+
+    # Validate image file data
+    if len(filePath) == 0:
+      self.messageBox("Empty filename", message="Please upload file again")
+      return
+    
+    self.newImagePath = filePath
+    
+    with Image.open(filePath) as tempImg:
+      # Store image temporarily under `temp` folder
+      tempImg = tempImg.resize((200, 200))
+      tempFile = f"temp/{time.time()}.png"
+      tempImg.save(tempFile)
+
+    tempImg = tk.PhotoImage(tempFile, width=200, height=200)
+    self.editImage = self.addLabel("", 0, 0)
+    self.editImage["image"] = tempImg
+    self.img_temp.append(tempImg)
+
+  @staticmethod
+  def getNewImageId():
+    # Specify the directory path
+    directory_path = "images"
+
+    # Get the list of files and directories in the specified directory
+    files_and_directories = os.listdir(directory_path)
+
+    # Filter out only the directories from the list
+    directories = [item for item in files_and_directories if os.path.isdir(os.path.join(directory_path, item))]
+    directories.remove("[imageId]")
+    return max([int(x) for x in directories])+1
+
+  def save(self):
+    # Validate name
+    name = self.editName.getText()
+    if len(name) == 0:
+      self.messageBox("Empty Name", message="Product name cannot be empty")
+      return
+    self.item["name"] = name
+    
+    # Validate price
+    try:
+      price = self.editPrice.getNumber()
+    except ValueError:
+      self.messageBox("Invalid Price", message="Product price must be a positive number or zero")
+      return
+    self.item["price"] = price
+    
+    # Validate unit
+    try:
+      unit = self.editUnit.getNumber()
+    except ValueError:
+      self.messageBox("Invalid Unit", message="Product unit must be a positive integer or zero")
+      return
+    self.item["unit"] = unit
+
+    # Validate image update, if any
+    if len(self.newImagePath) > 0:
+      newImageId = self.getNewImageId()
+      os.makedirs(f"images/{newImageId}")
+
+      # Preprocess images
+      with Image.open(self.newImagePath) as img:
+        img.save(f"images/{newImageId}/original.png")
+        img_1 = img.resize((200, 200))
+        img_1.save(f"images/{newImageId}/200x200.png")
+        img_2 = img.resize((100, 100))
+        img_2.save(f"images/{newImageId}/100x100.png")
+        img_3 = img.resize((50, 50))
+        img_3.save(f"images/{newImageId}/50x50.png")
+
+      self.item["imageId"] = newImageId
+    
+    # Save the new update
+    items[self.pos] = self.item
+    saveProducts(items)
+    self.parent.master.destroy()
+    ProductManagement().mainloop()
 
 def main():
   ManagerDashboard().mainloop()
