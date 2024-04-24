@@ -116,10 +116,11 @@ class ProductEditMenu(EasyFrame, tk.Toplevel):
       tempFile = f"temp/{time.time()}.png"
       tempImg.save(tempFile)
 
-    tempImg = tk.PhotoImage(tempFile, width=200, height=200)
-    self.editImage = self.addLabel("", 0, 0)
-    self.editImage["image"] = tempImg
+    self.reviewImg = self.addLabel("", row=0, column=1)
+    self.tempImg = tk.PhotoImage(tempFile, width=200, height=200)
+    self.reviewImg["image"] = self.tempImg
     self.img_temp.append(tempImg)
+    self.uploadButton["state"] = "disabled"
 
   @staticmethod
   def getNewImageId():
