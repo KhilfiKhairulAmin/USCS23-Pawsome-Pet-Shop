@@ -44,6 +44,7 @@ class ImageUpload(EasyFrame):
 
     # Get the list of files and directories in the specified directory
     files_and_directories = os.listdir(directory_path)
+    print(files_and_directories)
 
     # Filter out only the directories from the list
     directories = [item for item in files_and_directories if os.path.isdir(os.path.join(directory_path, item))]
