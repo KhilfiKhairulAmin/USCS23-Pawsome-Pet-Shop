@@ -10,18 +10,7 @@ def loadOrders():
   with open('db/orders.txt') as file:
     next(file)  # Skip data header
     for line in file:
-      (id, userId, address, datetime, status, totalPrice, *products_) = line.split(',')  
-
-      # Parse products into list of dictionaries
-      i = 2
-      products = []
-      while i < len(products_):
-        products.append({
-          "id": products_[i-2],
-          "price": float(products_[i-1]),
-          "quantity": int(products_[i])
-        })
-        i += 3
+      (id, userId, address, datetime, status, productId, quantity, price) = line.split(',')  
       
       orders.append({
         "id": id,
@@ -29,33 +18,19 @@ def loadOrders():
         "address": address,
         "datetime": datetime,
         "status": True if status == "True" else False,
-        "totalPrice": float(totalPrice),
-        "products": [
-          {
-            "id": "1",
-            "price": 10.0
-          },
-          {
-            "id": "2",
-            "price": 1
-          }
-        ]
+        "productId": productId,
+        "quantity": int(quantity),
+        "price": float(price)
       })
   
   return orders
 
 
 def saveOrders(orders: list[dict]):
-  header = "id,userId,address,datetime,status,totalPrice,productId,price1,productId2,price2,...,productIdN,priceN"
+  header = "id,userId,address,datetime,status,productId,quantity,price"
   raw_data = header + '\n'
   for order in orders:
-    raw_data += f'{order["id"]},{order["userId"]},{order["address"]},{order["datetime"]},{order["status"]},{order["totalPrice"]}'
-
-    for product in order["products"]:
-      v = list(product.values())
-      while len(v) > 0:
-        raw_data += f',{v.pop(0)},{v.pop(0)}'
-    raw_data += '\n'
+    raw_data += f'{order["id"]},{order["userId"]},{order["address"]},{order["datetime"]},{order["status"]},{order["productId"]},{order["quantity"]},{order["price"]}\n'
 
   with open('db/orders.txt', 'w') as file:
     file.write(raw_data)
@@ -63,9 +38,9 @@ def saveOrders(orders: list[dict]):
 
 def saveProducts(stocks):
   file = open("db/products.txt", 'w')
-  file.write("id,imageId,name,price,unit,sold\n")
+  file.write("id,imageId,name,price,unit,sold,totalStars\n")
   for stock in stocks:
-    file.write("{},{},{},{},{},{}\n".format(stock["id"], stock["imageId"], stock["name"], stock["price"], stock["unit"], stock["sold"]))
+    file.write("{},{},{},{},{},{},{}\n".format(stock["id"], stock["imageId"], stock["name"], stock["price"], stock["unit"], stock["sold"], stock["totalStars"]))
   file.close()
 
 
@@ -74,14 +49,15 @@ def loadProducts():
   next(file)  # Skip data header
   stocks = []
   for line in file:
-    id_, imageId, name, price, unit, sold = line.strip().split(",")
+    id_, imageId, name, price, unit, sold, totalStars = line.strip().split(",")
     stocks.append({
         "id": id_,
         "imageId": imageId,
         "name": name,
         "price": float(price),
         "unit": int(unit),
-        "sold": int(sold)
+        "sold": int(sold),
+        "totalStars": int(totalStars)
     })
   file.close()
   return stocks

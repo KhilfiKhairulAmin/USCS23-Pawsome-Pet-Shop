@@ -1,20 +1,65 @@
-from breezypythongui import EasyFrame
+from breezypythongui import EasyFrame, EasyPanel
 import tkinter as tk
 import tkinter.filedialog
 from PIL import Image
-from db import loadProducts, saveProducts
+from db import loadProducts, saveProducts, loadOrders, saveOrders
 import os
 import time
 
 
 products = loadProducts()
+orders = loadOrders()
 font = ("Verdana", 10, "bold")
-
 
 class ManagerDashboard(EasyFrame):
   def __init__(self):
     EasyFrame.__init__(self, "Main Dashboard")
-    self.addButton("Manage Products", 0, 0, command=self.manageProducts)
+    
+
+    temp = orders.copy()
+    temp.reverse()
+    temp = list(filter(lambda x: not x["status"], temp))
+    self.setBackground("grey")
+
+    start_row = 1
+    self.sidePanel = self.addPanel(0, 0, rowspan=len(orders)+start_row, background="white")
+    self.sidePanel.addButton("Manage Products", 1, 0, rowspan=2, command=self.manageProducts)
+    self.sidePanel.addButton("Analytics", 3, 0, command=self.manageProducts)
+    self.img = self.sidePanel.addLabel("", 0, 0, sticky="NSEW")
+    img = tk.PhotoImage(file="cat logo200x200transparent.png", height=200, width=200)
+    self.img["image"] = img
+    self.imgs = [img]
+
+    if len(temp) == 0:
+      self.addLabel("There are no orders currently.", 0, 1, sticky="NSEW", background="gray", foreground="white")
+      return
+
+    self.addLabel("Order ID", 0, 1, sticky="NES", background="gray")
+    self.addLabel("Datetime", 0, 2, sticky="NEWS", background="gray")
+    self.addLabel("Product", 0, 3, sticky="NEWS", background="gray")
+    self.addLabel("Quantity", 0, 4, sticky="NEWS", background="gray")
+    self.addLabel("Price", 0, 5, sticky="NEWS", background="gray")
+    self.addLabel("Total Price", 0, 6, sticky="NEWS", background="gray")
+    self.addLabel("Action", 0, 7, sticky="NEWS", background="gray")
+
+    for i in range(len(temp)):
+      order = temp[i]
+      j = i + start_row
+      product = list(filter(lambda x: x["id"] == order["productId"], products))[0]
+      # text = f"Order#{order['id']}\nDatetime: {order['datetime']}\nTotal Price: RM{'%.2f' % (order['price']*order['quantity'])}\nProduct: {product['name']}"
+      self.addLabel(order["id"], j, 1, sticky="NSE", background="gray")
+      self.addLabel(order["datetime"], j, 2, sticky="NSEW", background="gray")
+      self.addLabel(order["productId"], j, 3, sticky="NSEW", background="gray")
+      self.addLabel(order["quantity"], j, 4, sticky="NSEW", background="gray")
+      self.addLabel(order["price"], j, 5, sticky="NSEW", background="gray")
+      self.addLabel(f"RM{'%.2f' % (order['price']*order['quantity'])}", j, 6, sticky="NSEW", background="gray")
+      self.addButton("Deliver", j, 7, command=lambda pos=i: self.deliver(pos))
+
+  def deliver(self, pos):
+    orders[pos]["status"] = True
+    saveOrders(orders)
+    self.master.destroy()
+    ManagerDashboard().mainloop()
 
   def manageProducts(self):
     self.master.destroy()
@@ -25,6 +70,8 @@ class ProductManagement(EasyFrame):
   
   def __init__(self, pagination=0, search=""):
     EasyFrame.__init__(self, "Product Manager")
+
+    # tk.attributes("-fullscreen", True)
 
     self.page = pagination
     self.imgs = []  # used to store images reference because if not stored, it will get destroyed from memory
