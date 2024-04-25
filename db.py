@@ -38,9 +38,9 @@ def saveOrders(orders: list[dict]):
 
 def saveProducts(stocks):
   file = open("db/products.txt", 'w')
-  file.write("id,imageId,name,price,unit,sold,totalStars\n")
+  file.write("id,imageId,name,price,unit,sold,totalStars,type\n")
   for stock in stocks:
-    file.write("{},{},{},{},{},{},{}\n".format(stock["id"], stock["imageId"], stock["name"], stock["price"], stock["unit"], stock["sold"], stock["totalStars"]))
+    file.write("{},{},{},{},{},{},{},{}\n".format(stock["id"], stock["imageId"], stock["name"], stock["price"], stock["unit"], stock["sold"], stock["totalStars"], stock["type"]))
   file.close()
 
 
@@ -49,7 +49,7 @@ def loadProducts():
   next(file)  # Skip data header
   stocks = []
   for line in file:
-    id_, imageId, name, price, unit, sold, totalStars = line.strip().split(",")
+    id_, imageId, name, price, unit, sold, totalStars, type = line.strip().split(",")
     stocks.append({
         "id": id_,
         "imageId": imageId,
@@ -57,7 +57,8 @@ def loadProducts():
         "price": float(price),
         "unit": int(unit),
         "sold": int(sold),
-        "totalStars": int(totalStars)
+        "totalStars": int(totalStars),
+        "type": type
     })
   file.close()
   return stocks
