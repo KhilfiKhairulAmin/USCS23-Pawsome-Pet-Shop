@@ -1,4 +1,2 @@
-id,userId,address,datetime,status,totalPrice,productId,price1,productId2,price2,...,productIdN,priceN
-1,1,Kolej Cemara INTEC,2024-04-19 19:42:40.658769,True,5.9,1,10.0,2,1
-2,3,Kolej Akasia INTEC,2024-04-19 19:42:40.658769,False,10.0,1,10.0,2,1
-3,10,INTEC Education College,2024,False,10.0,1,10.0,2,1
+id,userId,address,datetime,status,productId,quantity,price
+1,3,Kolej Cemara INTEC,2024-04-19 19:42:40.658769,True,3,2,2.0
