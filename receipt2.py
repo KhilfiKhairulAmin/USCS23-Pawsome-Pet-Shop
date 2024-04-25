@@ -49,7 +49,7 @@ def receipt():
     overall_cost = tax + total_cost
 
     # Display total cost
-    total_label = Label(top, text=f"Total cost (inc. 10% tax): ${overall_cost:.2f}\nThank you for purchasing with us!", bg="sky blue")
+    total_label = Label(top, text=f"Total cost: ${(overall_cost - tax):.2f}\n10 % tax: ${tax:.2f}\nOverall cost = ${overall_cost}\nThank you for purchasing with us!", bg="sky blue")
     total_label.pack()
 
 b = Button(base, text="Print receipt", command=receipt)
