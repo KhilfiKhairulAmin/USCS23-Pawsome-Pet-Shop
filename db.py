@@ -73,7 +73,7 @@ def loadUsers():
       users.append({
           "id": id_,
           "username": username,
-          "password": password,
+          "password": password.strip(),
       })
   return users
 

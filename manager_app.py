@@ -14,46 +14,46 @@ font = ("Verdana", 10, "bold")
 class ManagerDashboard(EasyFrame):
   def __init__(self):
     EasyFrame.__init__(self, "Main Dashboard")
-    
+    self.master.attributes('-fullscreen', True)
 
     temp = orders.copy()
     temp.reverse()
     temp = list(filter(lambda x: not x["status"], temp))
-    self.setBackground("grey")
+    self.setBackground("#3f3a3c")
 
     start_row = 1
     self.sidePanel = self.addPanel(0, 0, rowspan=len(orders)+start_row, background="white")
     self.sidePanel.addButton("Manage Products", 1, 0, rowspan=2, command=self.manageProducts)
-    self.sidePanel.addButton("Analytics", 3, 0, command=self.manageProducts)
+    self.sidePanel.addButton("Analytics", 3, 0, command=self.analytics)
     self.img = self.sidePanel.addLabel("", 0, 0, sticky="NSEW")
     img = tk.PhotoImage(file="cat logo200x200transparent.png", height=200, width=200)
     self.img["image"] = img
     self.imgs = [img]
 
     if len(temp) == 0:
-      self.addLabel("There are no orders currently.", 0, 1, sticky="NSEW", background="gray", foreground="white")
+      self.addLabel("There are no orders currently.", 0, 1, sticky="NSEW", background="#3f3a3c", foreground="white")
       return
 
-    self.addLabel("Order ID", 0, 1, sticky="NES", background="gray")
-    self.addLabel("Datetime", 0, 2, sticky="NEWS", background="gray")
-    self.addLabel("Product", 0, 3, sticky="NEWS", background="gray")
-    self.addLabel("Quantity", 0, 4, sticky="NEWS", background="gray")
-    self.addLabel("Price", 0, 5, sticky="NEWS", background="gray")
-    self.addLabel("Total Price", 0, 6, sticky="NEWS", background="gray")
-    self.addLabel("Action", 0, 7, sticky="NEWS", background="gray")
+    self.addLabel("Order ID", 0, 1, sticky="NES", background="#3f3a3c", foreground="white")
+    self.addLabel("Datetime", 0, 2, sticky="NEWS", background="#3f3a3c", foreground="white")
+    self.addLabel("Product", 0, 3, sticky="NEWS", background="#3f3a3c", foreground="white")
+    self.addLabel("Quantity", 0, 4, sticky="NEWS", background="#3f3a3c", foreground="white")
+    self.addLabel("Price", 0, 5, sticky="NEWS", background="#3f3a3c", foreground="white")
+    self.addLabel("Total Price", 0, 6, sticky="NEWS", background="#3f3a3c", foreground="white")
+    self.addLabel("Action", 0, 7, sticky="NEWS", background="#3f3a3c", foreground="white")
 
     for i in range(len(temp)):
       order = temp[i]
       j = i + start_row
       product = list(filter(lambda x: x["id"] == order["productId"], products))[0]
       # text = f"Order#{order['id']}\nDatetime: {order['datetime']}\nTotal Price: RM{'%.2f' % (order['price']*order['quantity'])}\nProduct: {product['name']}"
-      self.addLabel(order["id"], j, 1, sticky="NSE", background="gray")
-      self.addLabel(order["datetime"], j, 2, sticky="NSEW", background="gray")
-      self.addLabel(order["productId"], j, 3, sticky="NSEW", background="gray")
-      self.addLabel(order["quantity"], j, 4, sticky="NSEW", background="gray")
-      self.addLabel(order["price"], j, 5, sticky="NSEW", background="gray")
-      self.addLabel(f"RM{'%.2f' % (order['price']*order['quantity'])}", j, 6, sticky="NSEW", background="gray")
-      self.addButton("Deliver", j, 7, command=lambda pos=i: self.deliver(pos))
+      self.addLabel(order["id"], j, 1, sticky="NSE", background="#3f3a3c", foreground="white")
+      self.addLabel(order["datetime"], j, 2, sticky="NSEW", background="#3f3a3c", foreground="white")
+      self.addLabel(order["productId"], j, 3, sticky="NSEW", background="#3f3a3c", foreground="white")
+      self.addLabel(order["quantity"], j, 4, sticky="NSEW", background="#3f3a3c", foreground="white")
+      self.addLabel(order["price"], j, 5, sticky="NSEW", background="#3f3a3c", foreground="white")
+      self.addLabel(f"RM{'%.2f' % (order['price']*order['quantity'])}", j, 6, sticky="NSEW", background="#3f3a3c", foreground="white")
+      self.addButton("Deliver", j, 7, command=lambda pos=i: self.deliver(pos)).config(foreground="white", background="gray")
 
   def deliver(self, pos):
     orders[pos]["status"] = True
@@ -65,13 +65,44 @@ class ManagerDashboard(EasyFrame):
     self.master.destroy()
     ProductManagement().mainloop()
 
+  def analytics(self):
+    self.master.destroy()
+    Analytics()
 
-class ProductManagement(EasyFrame):
+
+class Analytics(EasyFrame):
+  def __init__(self):
+    EasyFrame.__init__(self, "Analytics")
+    self.master.attributes('-fullscreen', True)
+
+    # Preprocess data
+    temp = products.copy()
+    hottest_item = max(products, key=lambda k: k["sold"])
+    highest_ratings = max(products, key=lambda k: k["totalStars"])
+
+    self.addLabel("Hottest Product", 0, 0, sticky="NSEW")
+    self.img1 = self.addLabel("", 1, 0, sticky="NSEW")
+    temp = tk.PhotoImage(file=f'images/{hottest_item["imageId"]}/200x200.png')
+    self.img1["image"] = temp
+    self.imgs = [temp]
+    self.addLabel(hottest_item["name"], 2, 0, sticky="NSEW")
+
+    self.addLabel("Highest Ratings", 0, 1, sticky="NSEW")
+    self.img2 = self.addLabel("", 1, 1, sticky="NSEW")
+    temp2 = tk.PhotoImage(file=f'images/{highest_ratings["imageId"]}/200x200.png')
+    self.img2["image"] = temp2
+    self.imgs.append(temp2)
+    self.addLabel(highest_ratings["name"], 2, 1, sticky="NSEW")
+
+  def __del__(self):
+    ManagerDashboard().mainloop()
+
+
+class ProductManagement(EasyFrame, tk.Toplevel):
   
   def __init__(self, pagination=0, search=""):
     EasyFrame.__init__(self, "Product Manager")
-
-    # tk.attributes("-fullscreen", True)
+    self.master.attributes('-fullscreen', True)
 
     self.page = pagination
     self.imgs = []  # used to store images reference because if not stored, it will get destroyed from memory
@@ -150,19 +181,18 @@ class ProductManagement(EasyFrame):
 
   def searchProduct(self):
     self.master.destroy()
-    ProductManagement(search=self.search.getText(), pagination=0).mainloop()
+    ProductManagement(search=self.search.getText(), pagination=0)
 
   def pagination(self, number):
     self.master.destroy()
-    ProductManagement(search=self.search.getText(), pagination=number).mainloop()
+    ProductManagement(search=self.search.getText(), pagination=number)
 
   def delete(self, item):
     def deleteProduct(item):
       products.pop(products.index(item))
       saveProducts(products)
-      self.master.destroy()
       ProductManagement().mainloop()
-
+  
     Modal("Delete Product", lambda item=item: deleteProduct(item))
 
 
@@ -177,7 +207,9 @@ class ProductEditMenu(EasyFrame, tk.Toplevel):
       "name": "",
       "price": 0,
       "unit": 0,
-      "sold": 0
+      "sold": 0,
+      "totalStars": 0,
+      "type": "food"
       }
     else:
       title = f"Edit Product#{product['id']}"
@@ -223,8 +255,23 @@ class ProductEditMenu(EasyFrame, tk.Toplevel):
     self.addLabel("Unit", row=8, column=0)
     self.editUnit = self.addIntegerField(product["unit"], row=9, column=0, sticky="W")
 
+    # Types
+    self.types = self.addRadiobuttonGroup(10, 0, rowspan=4)
+    food = self.types.addRadiobutton("Food")
+    if product["type"] == "food":
+      self.types.setSelectedButton(food)
+    medicine = self.types.addRadiobutton("Medicine")
+    if product["type"] == "medicine":
+      self.types.setSelectedButton(medicine)
+    hygiene = self.types.addRadiobutton("Hygiene")
+    if product["type"] == "hygiene":
+      self.types.setSelectedButton(hygiene)
+    toys = self.types.addRadiobutton("Toys")
+    if product["type"] == "toys":
+      self.types.setSelectedButton(toys)
+
     # Save Button
-    self.save = self.addButton("Save", row=10, column=0, command=self.save)
+    self.save = self.addButton("Save", row=14, column=0, command=self.save)
 
   def uploadImage(self):
     # Get image file
@@ -309,6 +356,9 @@ class ProductEditMenu(EasyFrame, tk.Toplevel):
       self.messageBox("Invalid Image", message="Please upload an image for this product")
       return
     
+    # Update type
+    self.item["type"] = self.types.getSelectedButton()["text"].lower()
+
     # Save the new update
     if self.pos == -1:
       products.append(self.item)
@@ -316,7 +366,7 @@ class ProductEditMenu(EasyFrame, tk.Toplevel):
       products[self.pos] = self.item
     saveProducts(products)
     self.parent.master.destroy()
-    ProductManagement().mainloop()
+    ProductManagement()
 
 
 class Modal(EasyFrame, tk.Toplevel):
