@@ -88,6 +88,17 @@ def saveUsers(users):
     file.write(raw_data)
 
 
+def saveSession(uid, cartNum):
+  with open('db/session.txt', 'w') as f:
+    f.write(f"{uid} {cartNum}")
+
+
+def loadSession():
+  with open('db/session.txt', 'r') as f:
+    uid, cart = next(f).split(" ")
+    return (uid, cart)
+
+
 if __name__ == "__main__":
   print("\nTEST 1: Load orders")
   orders = loadOrders()
