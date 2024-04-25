@@ -23,29 +23,42 @@ class ManagerDashboard(EasyFrame):
 
 class ProductManagement(EasyFrame):
   
-  def __init__(self, pagination=0):
+  def __init__(self, pagination=0, search=""):
     EasyFrame.__init__(self, "Product Manager")
 
     self.imgs = []  # used to store images reference because if not stored, it will get destroyed from memory
-    self.shopLogo = self.addLabel("", row=0, column=0, sticky="NSEW")
-    logo = tk.PhotoImage(file="cat logo100x100.png")
+    self.shopLogo = self.addLabel("", row=0, column=0, columnspan=2, sticky="NSEW")
+    logo = tk.PhotoImage(file="cat logo200x200.png", width=200, height=200)
     self.shopLogo["image"] = logo
     self.imgs.append(logo)
 
     # Add button
-    self.addButton("(+) Add Product", row=0, column=1, columnspan=2, command=self.add).config(font=font, background="#ee9b61", activebackground="white")
-    self.addLabel("Search", )
-    self.search = self.addTextField("", row=0, column=6, columnspan=3)
-    if len(products) == 0:
+    self.search = self.addTextField(search, row=0, column=2, columnspan=2, sticky="EW", width=25)
+    self.addButton("Search", row=0, column=4, command=self.searchProduct)
+    self.addButton("(+) Add Product", row=0, column=6, columnspan=2, command=self.add).config(font=font, background="#ee9b61", activebackground="white")
+    
+    global products
+
+    temp = products.copy()
+    if search != "":
+      temp = list(filter(lambda x: search in x["name"], products))
+
+    if len(temp) == 0:
       self.addLabel("No products yet. Add new product by pressing the button.", 1, 0, columnspan=7)
       return
+    elif len(temp) <= 5:
+      temp = temp[0: len(temp)]
+    elif pagination*5 >= len(temp):
+      temp = temp[pagination*5:len(temp)]
+    else:
+      temp = temp[pagination*5:pagination*5+5]
 
     # Table headers
-    self.addLabel("ID", row=1, column=0, sticky="SEW", font=font)
+    self.addLabel("ID", row=1, column=0, sticky="NSEW", font=font)
     self.addLabel("Image", row=1, column=1, sticky="NSEW", font=font)
     self.addLabel("Item Name", row=1, column=2, sticky="NSEW", font=font)
     self.addLabel("Price (RM)", row=1, column=3, sticky="NSEW", font=font)
-    self.addLabel("Unit", row=1, column=5, sticky="NSEW", font=font)
+    self.addLabel("Unit", row=1, column=4, sticky="NSEW", font=font)
     self.addLabel("Sold Unit", row=1, column=5, sticky="NSEW", font=font)
     self.addLabel("Actions", row=1, column=6, columnspan=2, sticky="NSEW", font=font)
 
@@ -53,68 +66,67 @@ class ProductManagement(EasyFrame):
     self.start_row = 3
     self.shift_amount = 0
     background_picker = lambda n: "#f3c59d" if n % 2 == 0 else "#ee9b62"
-    for i in range(self.start_row, self.start_row + 10):
+    for i in range(self.start_row, self.start_row + len(temp)):
       bg = background_picker(i-self.start_row)
-      product: dict = products[i-self.start_row]
+      product: dict = temp[(i-self.start_row)]
+      img = tk.PhotoImage(file=f"images/{product['imageId']}/75x75.png", height=75, width=75)
+      self.addButton("Edit", row=i, column=6, command=lambda item=product: self.edit(item)).configure(font=font, background=bg)
+      self.addButton("Delete", row=i, column=7, command=lambda item=product: self.delete(item)).configure(font=font, background=bg)
       self.addLabel(product["id"], row=i, column=0, sticky="NSEW", background=bg)
-      img = tk.PhotoImage(file=f"images/{product['imageId']}/100x100.png", height=50, width=50)
       img_label = self.addLabel("", row=i, column=1, sticky="NSEW")
       img_label["image"] = img
       self.imgs.append(img)
       self.addLabel(product["name"], row=i, column=2, sticky="NSEW", font=font, background=bg)
-      self.addLabel("%.2f" % product["price"], row=i, column=3, sticky="NSEW", font=font, background=bg)
+      price =  "" if str(product["price"]) == "" else "%.2f" % product["price"]
+      self.addLabel(price, row=i, column=3, sticky="NSEW", font=font, background=bg)
       self.addLabel(product["unit"], row=i, column=4, sticky="NSEW", font=font, background=bg)
       self.addLabel(product["sold"], row=i, column=5, sticky="NSEW", font=font, background=bg)
-      self.addButton("Edit", row=i, column=6, command=lambda pos=i-self.start_row: self.edit(pos)).configure(font=font, background=bg)
-      self.addButton("Delete", row=i, column=7, command=lambda pos=i-self.start_row: self.delete(pos)).configure(font=font, background=bg)
 
   def edit(self, item):
     ProductEditMenu(self, item)
 
   def add(self):
-    ProductEditMenu(self, {
-      "id": str(int(products[-1]["id"])+1),
+    ProductEditMenu(self)
+
+  def searchProduct(self):
+    self.master.destroy()
+    ProductManagement(search=self.search.getText())
+
+  def delete(self, item):
+    def deleteProduct(item):
+      products.pop(products.index(item))
+      saveProducts(products)
+      self.master.destroy()
+      ProductManagement().mainloop()
+
+    Modal("Delete Product", lambda item=item: deleteProduct(item))
+
+
+class ProductEditMenu(EasyFrame, tk.Toplevel):
+  def __init__(self, parent, product={
+      "id": "",
       "imageId": "",
       "name": "",
       "price": 0,
       "unit": 0,
       "sold": 0
-    })
+    }):
 
-  def delete(self, pos):
-    def deleteProduct(pos):
-      products.pop(pos)
-      saveProducts(products)
-      self.master.destroy()
-      ProductManagement().mainloop()
-
-    Modal("Delete Product", lambda pos=pos: deleteProduct(pos))
-
-
-class ProductEditMenu(EasyFrame, tk.Toplevel):
-  def __init__(self, parent, pos):
     title = "Add Product"
-    try:
-      # Get product at position `pos`
-      product = products[pos]
+    if product["id"] == "":
+      product["id"] = str(int(products[-1]["id"])+1)
+    else:
       title = f"Edit Product#{product['id']}"
-    except IndexError:
-      # For add new product
-      product = {
-        "id": str(pos),
-        "imageId": "",
-        "name": "",
-        "price": 0,
-        "unit": 0,
-        "sold": 0
-      }
 
     # Init window
     EasyFrame.__init__(self, title)
     tk.Toplevel.__init__(self)
 
     # Store position, item, parent, and image
-    self.pos = pos
+    try:
+      self.pos = products.index(product)
+    except ValueError:
+      self.pos = -1
     self.item = product
     self.parent = parent
     self.img_temp = []
@@ -224,19 +236,20 @@ class ProductEditMenu(EasyFrame, tk.Toplevel):
         img_1.save(f"images/{newImageId}/200x200.png")
         img_2 = img.resize((100, 100))
         img_2.save(f"images/{newImageId}/100x100.png")
-        img_3 = img.resize((50, 50))
-        img_3.save(f"images/{newImageId}/50x50.png")
-
+        img_3 = img.resize((100, 100))
+        img_3.save(f"images/{newImageId}/75x75.png")
+        img_4 = img.resize((75, 75))
+        img_4.save(f"images/{newImageId}/50x50.png")
       self.item["imageId"] = newImageId
     elif self.item["imageId"] == "":
       self.messageBox("Invalid Image", message="Please upload an image for this product")
       return
     
     # Save the new update
-    try:
-      products[self.pos] = self.item
-    except IndexError:
+    if self.pos == -1:
       products.append(self.item)
+    else:
+      products[self.pos] = self.item
     saveProducts(products)
     self.parent.master.destroy()
     ProductManagement().mainloop()
