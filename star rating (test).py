@@ -30,7 +30,7 @@ class StarRating(tk.Frame):
     def on_click(self, idx):
         if self.callback:
             self.callback(idx + 1)  # Rating is 1-based
-            messagebox.showinfo("Rating", "You rated: {}".format(idx + 1))
+            messagebox.showinfo("Rating", "You rated: {} stars.\nThank you for the ratings!".format(idx + 1))
 
 def updateRating(rating):
     print("You rated:", rating)
