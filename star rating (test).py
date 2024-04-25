@@ -1,5 +1,5 @@
-#referring to youtube as a reference 
 import tkinter as tk
+from tkinter import messagebox
 
 class StarRating(tk.Frame):
     def __init__(self, master=None, numStars=5, callback=None):
@@ -30,7 +30,7 @@ class StarRating(tk.Frame):
     def on_click(self, idx):
         if self.callback:
             self.callback(idx + 1)  # Rating is 1-based
-            
+            messagebox.showinfo("Rating", "You rated: {}".format(idx + 1))
 
 def updateRating(rating):
     print("You rated:", rating)
