@@ -33,7 +33,7 @@ class StarRating(tk.Frame):
             
 
 def updateRating(rating):
-    print("Rated:", rating)
+    print("You rated:", rating)
 
 if __name__ == "__main__":
     root = tk.Tk()
