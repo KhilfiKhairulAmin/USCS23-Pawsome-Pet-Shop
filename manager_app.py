@@ -8,7 +8,7 @@ import time
 
 
 products = loadProducts()
-font = ("Verdana", 11)
+font = ("Verdana", 10)
 
 
 class ManagerDashboard(EasyFrame):
@@ -23,40 +23,41 @@ class ManagerDashboard(EasyFrame):
 
 class ProductManagement(EasyFrame):
   
-  def __init__(self):
+  def __init__(self, pagination=0):
     EasyFrame.__init__(self, "Product Manager")
 
     self.imgs = []  # used to store images reference because if not stored, it will get destroyed from memory
-    self.shopLogo = self.addLabel("", row=0, column=0, columnspan=8, sticky="NSEW")
-    logo = tk.PhotoImage(file="cat logo375x375.jpg")
+    self.shopLogo = self.addLabel("", row=0, column=0, sticky="NSEW")
+    logo = tk.PhotoImage(file="cat logo100x100.png")
     self.shopLogo["image"] = logo
     self.imgs.append(logo)
 
     # Add button
-    self.addButton("Add Product", row=1, column=0, columnspan=8, command=self.add).config(font=font, background="#ee9b61", activebackground="white")
-
+    self.addButton("(+) Add Product", row=0, column=1, columnspan=2, command=self.add).config(font=font, background="#ee9b61", activebackground="white")
+    self.addLabel("Search", )
+    self.search = self.addTextField("", row=0, column=6, columnspan=3)
     if len(products) == 0:
       self.addLabel("No products yet. Add new product by pressing the button.", 1, 0, columnspan=7)
       return
 
     # Table headers
-    self.addLabel("ID", row=2, column=0, sticky="NSEW", font=font)
-    self.addLabel("Image", row=2, column=1, sticky="NSEW", font=font)
-    self.addLabel("Item Name", row=2, column=2, sticky="NSEW", font=font)
-    self.addLabel("Price (RM)", row=2, column=3, sticky="NSEW", font=font)
-    self.addLabel("Unit", row=2, column=4, sticky="NSEW", font=font)
-    self.addLabel("Sold Unit", row=2, column=5, sticky="NSEW", font=font)
-    self.addLabel("Actions", row=2, column=6, columnspan=2, sticky="NSEW", font=font)
+    self.addLabel("ID", row=1, column=0, sticky="SEW", font=font)
+    self.addLabel("Image", row=1, column=1, sticky="NSEW", font=font)
+    self.addLabel("Item Name", row=1, column=2, sticky="NSEW", font=font)
+    self.addLabel("Price (RM)", row=1, column=3, sticky="NSEW", font=font)
+    self.addLabel("Unit", row=1, column=5, sticky="NSEW", font=font)
+    self.addLabel("Sold Unit", row=1, column=5, sticky="NSEW", font=font)
+    self.addLabel("Actions", row=1, column=6, columnspan=2, sticky="NSEW", font=font)
 
     # Display each column of data in the table row-by-row
     self.start_row = 3
     self.shift_amount = 0
     background_picker = lambda n: "#f3c59d" if n % 2 == 0 else "#ee9b62"
-    for i in range(self.start_row, self.start_row + len(products)):
+    for i in range(self.start_row, self.start_row + 10):
       bg = background_picker(i-self.start_row)
       product: dict = products[i-self.start_row]
       self.addLabel(product["id"], row=i, column=0, sticky="NSEW", background=bg)
-      img = tk.PhotoImage(file=f"images/{product['imageId']}/50x50.png", height=50, width=50)
+      img = tk.PhotoImage(file=f"images/{product['imageId']}/100x100.png", height=50, width=50)
       img_label = self.addLabel("", row=i, column=1, sticky="NSEW")
       img_label["image"] = img
       self.imgs.append(img)
@@ -67,11 +68,18 @@ class ProductManagement(EasyFrame):
       self.addButton("Edit", row=i, column=6, command=lambda pos=i-self.start_row: self.edit(pos)).configure(font=font, background=bg)
       self.addButton("Delete", row=i, column=7, command=lambda pos=i-self.start_row: self.delete(pos)).configure(font=font, background=bg)
 
-  def edit(self, pos):
-    ProductEditMenu(self, pos)
+  def edit(self, item):
+    ProductEditMenu(self, item)
 
   def add(self):
-    ProductEditMenu(self, len(products)+1)
+    ProductEditMenu(self, {
+      "id": str(int(products[-1]["id"])+1),
+      "imageId": "",
+      "name": "",
+      "price": 0,
+      "unit": 0,
+      "sold": 0
+    })
 
   def delete(self, pos):
     def deleteProduct(pos):
