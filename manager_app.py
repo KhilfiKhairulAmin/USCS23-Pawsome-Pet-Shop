@@ -8,7 +8,7 @@ import time
 
 
 products = loadProducts()
-font = ("Verdana", 10)
+font = ("Verdana", 10, "bold")
 
 
 class ManagerDashboard(EasyFrame):
@@ -26,6 +26,7 @@ class ProductManagement(EasyFrame):
   def __init__(self, pagination=0, search=""):
     EasyFrame.__init__(self, "Product Manager")
 
+    self.page = pagination
     self.imgs = []  # used to store images reference because if not stored, it will get destroyed from memory
     self.shopLogo = self.addLabel("", row=0, column=0, columnspan=2, sticky="NSEW")
     logo = tk.PhotoImage(file="cat logo200x200.png", width=200, height=200)
@@ -35,23 +36,32 @@ class ProductManagement(EasyFrame):
     # Add button
     self.search = self.addTextField(search, row=0, column=2, columnspan=2, sticky="EW", width=25)
     self.addButton("Search", row=0, column=4, command=self.searchProduct)
-    self.addButton("(+) Add Product", row=0, column=6, columnspan=2, command=self.add).config(font=font, background="#ee9b61", activebackground="white")
+    self.addButton("(+) Add Product", row=0, column=7, columnspan=1, command=self.add).config(font=font, background="#ee9b61", activebackground="white")
     
     global products
 
     temp = products.copy()
     if search != "":
-      temp = list(filter(lambda x: search in x["name"], products))
+      temp = list(filter(lambda x: search.lower() in x["name"].lower(), products))
 
     if len(temp) == 0:
-      self.addLabel("No products yet. Add new product by pressing the button.", 1, 0, columnspan=7)
+      self.addLabel("No products yet. Add new product by pressing the button.", 1, 0, columnspan=7, sticky="NEW")
       return
     elif len(temp) <= 5:
       temp = temp[0: len(temp)]
-    elif pagination*5 >= len(temp):
+    elif pagination == 0:
+      temp = temp[0:5]
+      page = self.page
+      self.addButton(">", row=0, column=6, command=lambda page=page: self.pagination(page+1))
+    elif pagination*5+5 >= len(temp):
       temp = temp[pagination*5:len(temp)]
+      page = self.page
+      self.addButton("<", row=0, column=5, command=lambda page=page: self.pagination(page-1))
     else:
       temp = temp[pagination*5:pagination*5+5]
+      page = self.page
+      self.addButton("<", row=0, column=5, command=lambda page=page: self.pagination(page-1))
+      self.addButton(">", row=0, column=6, command=lambda page=page: self.pagination(page+1))
 
     # Table headers
     self.addLabel("ID", row=1, column=0, sticky="NSEW", font=font)
@@ -81,6 +91,9 @@ class ProductManagement(EasyFrame):
       self.addLabel(price, row=i, column=3, sticky="NSEW", font=font, background=bg)
       self.addLabel(product["unit"], row=i, column=4, sticky="NSEW", font=font, background=bg)
       self.addLabel(product["sold"], row=i, column=5, sticky="NSEW", font=font, background=bg)
+  
+  def __del__(self):
+    ManagerDashboard().mainloop()
 
   def edit(self, item):
     ProductEditMenu(self, item)
@@ -90,7 +103,11 @@ class ProductManagement(EasyFrame):
 
   def searchProduct(self):
     self.master.destroy()
-    ProductManagement(search=self.search.getText())
+    ProductManagement(search=self.search.getText(), pagination=0).mainloop()
+
+  def pagination(self, number):
+    self.master.destroy()
+    ProductManagement(search=self.search.getText(), pagination=number).mainloop()
 
   def delete(self, item):
     def deleteProduct(item):
@@ -103,18 +120,18 @@ class ProductManagement(EasyFrame):
 
 
 class ProductEditMenu(EasyFrame, tk.Toplevel):
-  def __init__(self, parent, product={
-      "id": "",
+  def __init__(self, parent, product=None):
+
+    title = "Add Product"
+    if not product:
+      product = {
+      "id": str(int(products[-1]["id"])+1),
       "imageId": "",
       "name": "",
       "price": 0,
       "unit": 0,
       "sold": 0
-    }):
-
-    title = "Add Product"
-    if product["id"] == "":
-      product["id"] = str(int(products[-1]["id"])+1)
+      }
     else:
       title = f"Edit Product#{product['id']}"
 
