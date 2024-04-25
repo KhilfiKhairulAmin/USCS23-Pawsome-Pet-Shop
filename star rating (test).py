@@ -1,3 +1,5 @@
+#referring to website 
+
 import tkinter as tk
 from tkinter import messagebox
 
@@ -10,20 +12,20 @@ class StarRating(tk.Frame):
         self.createWidgets()
 
     def createWidgets(self):
-        self.stars = []
+        self.stars = [] #empty list to store the stars
         for i in range(self.numStars):
             star = tk.Label(self, text="⭐", font=("Arial", 20))
             star.bind("<Enter>", lambda event, idx=i: self.on_enter(idx))
             star.bind("<Leave>", lambda event, idx=i: self.on_leave(idx))
             star.bind("<Button-1>", lambda event, idx=i: self.on_click(idx))
             star.grid(row=0, column=i)
-            self.stars.append(star)
+            self.stars.append(star) #add the stars in the list 
 
-    def on_enter(self, idx):
+    def on_enter(self, idx): #stars change color when the mouse about to click
         for i in range(idx + 1):
             self.stars[i].config(fg="orange")
 
-    def on_leave(self, idx):
+    def on_leave(self, idx): #stars change color when the mouse about to leave 
         for i in range(idx + 1):
             self.stars[i].config(fg="black")
 
