@@ -64,7 +64,6 @@ def open_rating_window(parent):
 
 def on_rating_submit(rating, parent):
     print("You rated:", rating)
-    # Optionally, you can save the rating to a file or perform other actions here
 
     # Close the parent window (receipt window)
     parent.destroy()
