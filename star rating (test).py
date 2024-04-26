@@ -6,14 +6,14 @@ class StarRating(tk.Frame):
         super().__init__(master)
         self.master = master
         self.numStars = numStars
-        self.callback = callback
+        self.callback = callback #a function to call when rating is selected
         self.createWidgets()
 
     def createWidgets(self):
         self.stars = [] #empty list to store the stars
         for i in range(self.numStars):
             star = tk.Label(self, text="⭐", font=("Arial", 20))
-            star.bind("<Enter>", lambda event, idx=i: self.on_enter(idx))
+            star.bind("<Enter>", lambda event, idx=i: self.on_enter(idx)) #set a default value 'i' for the 'idx' param. then 'idx' will capture the current value of i when lambda is defined
             star.bind("<Leave>", lambda event, idx=i: self.on_leave(idx))
             star.bind("<Button-1>", lambda event, idx=i: self.on_click(idx))
             star.grid(row=0, column=i)
@@ -29,8 +29,8 @@ class StarRating(tk.Frame):
 
     def on_click(self, idx):
         if self.callback:
-            self.callback(idx + 1)  # Rating is 1-based
-            messagebox.showinfo("Rating", "You rated: {} stars.\nThank you for the ratings!".format(idx + 1))
+            self.callback(idx + 1)  #rating is 1-based, callback will pop up the message box when star is click 
+            messagebox.showinfo("Rating", "You rated: {} stars.\nThank you for the ratings!".format(idx + 1)) 
 
 def updateRating(rating):
     print("You rated:", rating)
