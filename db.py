@@ -38,9 +38,9 @@ def saveOrders(orders: list[dict]):
 
 def saveProducts(stocks):
   file = open("db/products.txt", 'w')
-  file.write("id,imageId,name,price,unit,sold,totalStars\n")
+  file.write("id,imageId,name,price,unit,sold,totalStars,type\n")
   for stock in stocks:
-    file.write("{},{},{},{},{},{},{}\n".format(stock["id"], stock["imageId"], stock["name"], stock["price"], stock["unit"], stock["sold"], stock["totalStars"]))
+    file.write("{},{},{},{},{},{},{},{}\n".format(stock["id"], stock["imageId"], stock["name"], stock["price"], stock["unit"], stock["sold"], stock["totalStars"], stock["type"]))
   file.close()
 
 
@@ -49,7 +49,7 @@ def loadProducts():
   next(file)  # Skip data header
   stocks = []
   for line in file:
-    id_, imageId, name, price, unit, sold, totalStars = line.strip().split(",")
+    id_, imageId, name, price, unit, sold, totalStars, type = line.strip().split(",")
     stocks.append({
         "id": id_,
         "imageId": imageId,
@@ -57,7 +57,8 @@ def loadProducts():
         "price": float(price),
         "unit": int(unit),
         "sold": int(sold),
-        "totalStars": int(totalStars)
+        "totalStars": int(totalStars),
+        "type": type
     })
   file.close()
   return stocks
@@ -72,7 +73,7 @@ def loadUsers():
       users.append({
           "id": id_,
           "username": username,
-          "password": password,
+          "password": password.strip(),
       })
   return users
 
@@ -85,6 +86,17 @@ def saveUsers(users):
   
   with open('db/users.txt', 'w') as file:
     file.write(raw_data)
+
+
+def saveSession(uid, cartNum):
+  with open('db/session.txt', 'w') as f:
+    f.write(f"{uid} {cartNum}")
+
+
+def loadSession():
+  with open('db/session.txt', 'r') as f:
+    uid, cart = next(f).split(" ")
+    return (uid, cart)
 
 
 if __name__ == "__main__":

@@ -1,4 +1,7 @@
-id,imageId,name,price,unit,sold
-1,26,Minecraft,100.0,2,2
-2,4,Classic Selection Wet Food in Sauce ok,40.28,2,0
-3,28,Super Duper car food,0.0,0,0
+id,imageId,name,price,unit,sold,totalStars,type
+3,70,re4,99000999.0,10,0,0,medicine
+4,64,uu,0.0,0,0,0,medicine
+5,65,7y,0.0,0,0,0,hygiene
+6,66,hhh,0.0,0,0,0,toys
+7,67,fnaf,0.0,0,0,0,toys
+8,69,kkkk,0.0,0,0,0,medicine

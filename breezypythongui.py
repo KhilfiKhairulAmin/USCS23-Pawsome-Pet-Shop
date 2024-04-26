@@ -497,7 +497,7 @@ class EasyRadiobuttonGroup(Tkinter.Frame):
         self.grid(row = row, column = column,
                   rowspan = rowspan, columnspan = columnspan,
                   sticky = N+S+E+W)
-        self._commonVar = Tkinter.StringVar("")
+        self._commonVar = Tkinter.StringVar()
         self._buttons = dict()
         self._orient = orient
         self._buttonRow = self._buttonColumn = 0
