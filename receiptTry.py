@@ -1,7 +1,5 @@
 from tkinter import *
-
-base = Tk()
-base.geometry("400x150")
+from starRating import StarRating  # Import your StarRating class from the starRating module
 
 def receipt():
     top = Toplevel()
@@ -52,8 +50,32 @@ def receipt():
     total_label = Label(top, text=f"Total cost: ${(overall_cost - tax):.2f}\n10 % tax: ${tax:.2f}\nOverall cost = ${overall_cost}\nThank you for purchasing with us!", bg="sky blue")
     total_label.pack()
 
-b = Button(base, text="Print receipt", command=receipt)
-b.pack(padx=10, pady=10)
+    # Button to open the star rating window
+    rating_button = Button(top, text="Give Rating", command=lambda: open_rating_window(top))
+    rating_button.pack(pady=10)
 
+def open_rating_window(parent):
+    rating_window = Toplevel()
+    rating_window.title("Give Rating")
 
-base.mainloop()
+    # Create and pack the StarRating widget in the rating window
+    rating_frame = StarRating(rating_window, numStars=5, callback=lambda rating: on_rating_submit(rating, parent))
+    rating_frame.pack(pady=20)
+
+def on_rating_submit(rating, parent):
+    print("You rated:", rating)
+    # Optionally, you can save the rating to a file or perform other actions here
+
+    # Close the parent window (receipt window)
+    parent.destroy()
+
+if __name__ == "__main__":
+    base = Tk()
+    base.geometry("400x150")
+    base.title("Purchase Receipt and Rating")
+
+    # Button to print the receipt
+    print_receipt_button = Button(base, text="Print Receipt", command=receipt)
+    print_receipt_button.pack(padx=10, pady=10)
+
+    base.mainloop()

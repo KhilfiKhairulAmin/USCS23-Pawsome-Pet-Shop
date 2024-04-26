@@ -34,7 +34,7 @@ class StarRating(tk.Frame):
             self.saveRatings(idx + 1)  # Call saveRatings with the rating
 
     def saveRatings(self, rating):
-        with open("rating.txt", 'a') as file: #add the ratings in a rating.txt
+        with open("rating.txt", 'a') as file: #add the ratings in a rating file
             file.write("Product is rated {}\n ".format(rating))
 
 def updateRating(rating):
