@@ -6,31 +6,36 @@ class StarRating(tk.Frame):
         super().__init__(master)
         self.master = master
         self.numStars = numStars
-        self.callback = callback #a function to call when rating is selected
+        self.callback = callback #function to call when rating is selected
         self.createWidgets()
 
     def createWidgets(self):
-        self.stars = [] #empty list to store the stars
+        self.stars = []
         for i in range(self.numStars):
             star = tk.Label(self, text="⭐", font=("Arial", 20))
             star.bind("<Enter>", lambda event, idx=i: self.on_enter(idx)) #set a default value 'i' for the 'idx' param. then 'idx' will capture the current value of i when lambda is defined
             star.bind("<Leave>", lambda event, idx=i: self.on_leave(idx))
             star.bind("<Button-1>", lambda event, idx=i: self.on_click(idx))
             star.grid(row=0, column=i)
-            self.stars.append(star) #add the stars in the list 
+            self.stars.append(star)
 
     def on_enter(self, idx): #stars change color when the mouse about to click
         for i in range(idx + 1):
             self.stars[i].config(fg="orange")
 
-    def on_leave(self, idx): #stars change color when the mouse about to leave 
+    def on_leave(self, idx): #stars change color when the mouse about to leave
         for i in range(idx + 1):
             self.stars[i].config(fg="black")
 
     def on_click(self, idx):
         if self.callback:
-            self.callback(idx + 1)  #rating is 1-based, callback will pop up the message box when star is click 
-            messagebox.showinfo("Rating", "You rated: {} stars.\nThank you for the ratings!".format(idx + 1)) 
+            self.callback(idx + 1)
+            messagebox.showinfo("Rating", "You rated: {} stars.\nThank you for the ratings!".format(idx + 1)) #rating is 1-based, callback will pop up the message box when star is click 
+            self.saveRatings(idx + 1)  # Call saveRatings with the rating
+
+    def saveRatings(self, rating):
+        with open("rating.txt", 'a') as file: #add the ratings in a rating.txt
+            file.write("Product is rated {}\n ".format(rating))
 
 def updateRating(rating):
     print("You rated:", rating)
