@@ -1,1 +1,0 @@
-itemId,feedback1,feedback2,...,feedbackN
