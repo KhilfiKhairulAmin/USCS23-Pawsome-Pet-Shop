@@ -6,8 +6,7 @@ Entrypoint of the user application.
 
 from tkinter import *
 from tkinter import messagebox
-from db import loadUsers, saveUsers, loadProducts, saveSession
-from catalogue import shopCatalogue
+from db import loadOrders, loadUsers, saveUsers, saveSession
 
 # Setup GUI window for login
 show = Tk()
@@ -24,7 +23,7 @@ def signin():
     """Sign in function to validate user credentials."""
     username = user.get()
     password = passw.get()
-    
+
     if username=="" or password=="":
         messagebox.showerror("Error","All fields are required")
         return
@@ -33,11 +32,12 @@ def signin():
         if u["username"] == username and u["password"] == password:
             uid = u["id"]
             show.destroy()
-            cartNum = str(int(loadProducts()[-1]["id"])+1)
+            cartNum = str(int(loadOrders()[-1]["id"])+1)
             saveSession(uid, cartNum)
+            from catalogue import shopCatalogue
             shopCatalogue().mainloop()
-            break
-
+            return
+    
     messagebox.showerror("Error","Username or password is wrong")
 
 
@@ -147,7 +147,7 @@ def signup_command():
 
 #logo
 img = PhotoImage(file="images/cat logo.png")
-Label(show,image=img,bg='white').place(x=50,y=50)
+label = Label(show,image=img,bg='white').place(x=50,y=50)
 
 #login frame
 frame = Frame(show,width=700,height=700,bg="white")

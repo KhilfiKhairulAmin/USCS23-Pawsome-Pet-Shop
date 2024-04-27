@@ -4,16 +4,18 @@ Author: Murfiqah, Khilfi, Zainatul
 Main view for the user to buy items from the shop.
 """
 
+import datetime
 from breezypythongui import EasyFrame
 from tkinter import *
 from tkinter.font import Font
-from db import loadSession, loadProducts
+from db import loadOrders, loadSession, loadProducts, saveOrders
 from tkinter import messagebox
 
 
 # Global variables to store products, user ID, cart number, and cart items
 Products = loadProducts()
 UID, CARTNUMBER = loadSession()
+ADRESS = ""
 Cart = {}
 
 # Global variables to store screen dimensions
@@ -122,8 +124,9 @@ class ShowProducts(EasyFrame):
         
         # Navigation buttons
         self.panel = self.addPanel(8, 0, columnspan=3, background="orange")
-        self.panel.nextpage = self.addButton(text="Checkout Receipt", row=8, column=0, columnspan=2, command=self.checkout)
-        self.panel.back = self.addButton(text="Back to Homepage", row=8, column=1, columnspan=2, command = self.goback)
+        self.panel.addButton(text="Checkout Receipt", row=8, column=0, columnspan=1, command=self.checkout)
+        self.panel.addButton(text="Back to Homepage", row=8, column=1, columnspan=1, command = self.goback)
+        self.panel.addButton(text="Order History", row=8, column=2, command=self.orders)
         
         self.imgs = []  # Temporary array to keep images in memory so that it is not lost
         i = 0
@@ -147,6 +150,9 @@ class ShowProducts(EasyFrame):
         self.master.destroy()
         ShowProducts(type=self.type, pagination=page)
 
+    def orders(self):
+        ViewOrder()
+
     def addToCart(self, item):
         ViewProduct(item)
     
@@ -156,6 +162,25 @@ class ShowProducts(EasyFrame):
     def goback(self):
         self.master.destroy()
         shopCatalogue().mainloop()
+
+
+class ViewOrder(EasyFrame, Toplevel):
+    def __init__(self):
+        EasyFrame.__init__(self, "Order History")
+        Toplevel.__init__(self)
+
+        self.addLabel("No.", 0, 0, background="orange", foreground="white")
+        self.addLabel("Address", 0, 1, background="orange", foreground="white")
+        self.addLabel("Status", 0, 2, background="orange", foreground="white")
+
+        temp = list(filter(lambda x: x["userId"] == UID, loadOrders()))
+
+        start_row = 1
+        for i in range(start_row, len(temp)+start_row):
+            order = temp[i-start_row]
+            self.addLabel(f"{i-start_row}", i, 0, background="orange", foreground="white")
+            self.addLabel(order['address'], i, 1, background="orange", foreground="white")
+            self.addLabel("Process" if not order['status'] else "Delivered", i, 2, background="orange", foreground="white")
 
 
 class ViewProduct(EasyFrame, Toplevel):
@@ -242,10 +267,34 @@ class Checkout(EasyFrame, Toplevel):
         total_label.pack()  
 
         # Button to open the star rating window
-        rating_button = Button(self, text="Give Rating", command=self.open_rating_window)
+        rating_button = Button(self, text="Pay using Auto Debit", command=self.open_rating_window)
         rating_button.pack(pady=10)
 
     def open_rating_window(self):
+        # Obtain delivery address
+        global ADRESS, CARTNUMBER
+        ADRESS = self.prompterBox("Address", "Delivery address", inputText=ADRESS, fieldWidth=40)
+
+        # Update stock quantity
+        for k in Cart.keys():
+            Cart[k]['unit'] -= Cart[k]['quantity']   
+        
+        # Save order
+        Orders = loadOrders()
+        Orders.append({
+            "id": CARTNUMBER,
+            "userId": UID,
+            "address": ADRESS,
+            "datetime": str(datetime.datetime.now()),
+            "status": False
+        })
+        saveOrders(Orders)
+
+        # Set up new order
+        CARTNUMBER = str(int(CARTNUMBER)+1)
+        Cart.clear() 
+
+        # Go to ratings
         rating_window = Toplevel()
         rating_window.title("Give Rating")
 
@@ -259,10 +308,6 @@ class Checkout(EasyFrame, Toplevel):
 
         # Close the parent window (receipt window)
         parent.destroy()
-
-    def pay(self):
-        self.messageBox("Payment Successful!", message="Thank you for ordering with us! Your order is on its way ^..^")
-        self.master.destroy()
 
     def goback(self):
         self.master.destroy()
@@ -304,7 +349,7 @@ class StarRating(Frame):
 
     def saveRatings(self, rating):
         with open("db/rating.txt", 'a') as file: #add the ratings in a rating file
-            file.write(f"#{UID} rated {rating} STARS")
+            file.write(f"#{UID} rated {rating} STARS\n")
         Feedback()
 
     def updateRating(rating):
@@ -324,6 +369,7 @@ class Feedback(EasyFrame, Toplevel):
     def saveFeedback(self):
         with open("db/feedback.txt", 'a') as file: 
             file.write(self.feedback + '\n')
+        self.messageBox("Payment Successful!", message="Thank you for ordering with us! Your order is on its way ^..^")
 
         
 def main():

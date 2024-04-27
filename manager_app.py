@@ -26,7 +26,7 @@ class ManagerDashboard(EasyFrame):
     self.sidePanel.addButton("Manage Products", 1, 0, rowspan=2, command=self.manageProducts)
     self.sidePanel.addButton("Analytics", 3, 0, command=self.analytics)
     self.img = self.sidePanel.addLabel("", 0, 0, sticky="NSEW")
-    img = tk.PhotoImage(file="cat logo200x200transparent.png", height=200, width=200)
+    img = tk.PhotoImage(file="images/cat logo200x200transparent.png", height=200, width=200)
     self.img["image"] = img
     self.imgs = [img]
 
@@ -82,14 +82,14 @@ class Analytics(EasyFrame):
 
     self.addLabel("Hottest Product", 0, 0, sticky="NSEW")
     self.img1 = self.addLabel("", 1, 0, sticky="NSEW")
-    temp = tk.PhotoImage(file=f'images/{hottest_item["imageId"]}/200x200.png')
+    temp = tk.PhotoImage(file=f'image_db/{hottest_item["imageId"]}/200x200.png')
     self.img1["image"] = temp
     self.imgs = [temp]
     self.addLabel(hottest_item["name"], 2, 0, sticky="NSEW")
 
     self.addLabel("Highest Ratings", 0, 1, sticky="NSEW")
     self.img2 = self.addLabel("", 1, 1, sticky="NSEW")
-    temp2 = tk.PhotoImage(file=f'images/{highest_ratings["imageId"]}/200x200.png')
+    temp2 = tk.PhotoImage(file=f'image_db/{highest_ratings["imageId"]}/200x200.png')
     self.img2["image"] = temp2
     self.imgs.append(temp2)
     self.addLabel(highest_ratings["name"], 2, 1, sticky="NSEW")
@@ -105,7 +105,7 @@ class ProductManagement(EasyFrame, tk.Toplevel):
     self.master.attributes('-fullscreen', True)
 
     self.page = pagination
-    self.imgs = []  # used to store images reference because if not stored, it will get destroyed from memory
+    self.imgs = []  # used to store image_db reference because if not stored, it will get destroyed from memory
     self.shopLogo = self.addLabel("", row=0, column=0, columnspan=2, sticky="NSEW")
     logo = tk.PhotoImage(file="cat logo200x200.png", width=200, height=200)
     self.shopLogo["image"] = logo
@@ -157,7 +157,7 @@ class ProductManagement(EasyFrame, tk.Toplevel):
     for i in range(self.start_row, self.start_row + len(temp)):
       bg = background_picker(i-self.start_row)
       product: dict = temp[(i-self.start_row)]
-      img = tk.PhotoImage(file=f"images/{product['imageId']}/75x75.png", height=75, width=75)
+      img = tk.PhotoImage(file=f"image_db/{product['imageId']}/75x75.png", height=75, width=75)
       self.addButton("Edit", row=i, column=6, command=lambda item=product: self.edit(item)).configure(font=font, background=bg)
       self.addButton("Delete", row=i, column=7, command=lambda item=product: self.delete(item)).configure(font=font, background=bg)
       self.addLabel(product["id"], row=i, column=0, sticky="NSEW", background=bg)
@@ -206,7 +206,6 @@ class ProductEditMenu(EasyFrame, tk.Toplevel):
       "price": 0,
       "unit": 0,
       "sold": 0,
-      "totalStars": 0,
       "type": "food"
       }
     else:
@@ -228,7 +227,7 @@ class ProductEditMenu(EasyFrame, tk.Toplevel):
     # Product image
     self.editImage = self.addLabel("", row=0, column=0, sticky="NSEW")
     try:
-      img = tk.PhotoImage(file=f"images/{product['imageId']}/200x200.png", width=200, height=200)
+      img = tk.PhotoImage(file=f"image_db/{product['imageId']}/200x200.png", width=200, height=200)
     except:
       img = ""
 
@@ -299,7 +298,7 @@ class ProductEditMenu(EasyFrame, tk.Toplevel):
   @staticmethod
   def getNewImageId():
     # Specify the directory path
-    directory_path = "images"
+    directory_path = "image_db"
 
     # Get the list of files and directories in the specified directory
     files_and_directories = os.listdir(directory_path)
@@ -336,19 +335,19 @@ class ProductEditMenu(EasyFrame, tk.Toplevel):
     # Validate image update, if any
     if len(self.newImagePath) > 0:
       newImageId = self.getNewImageId()
-      os.makedirs(f"images/{newImageId}")
+      os.makedirs(f"image_db/{newImageId}")
 
-      # Preprocess images
+      # Preprocess image_db
       with Image.open(self.newImagePath) as img:
-        img.save(f"images/{newImageId}/original.png")
+        img.save(f"image_db/{newImageId}/original.png")
         img_1 = img.resize((200, 200))
-        img_1.save(f"images/{newImageId}/200x200.png")
+        img_1.save(f"image_db/{newImageId}/200x200.png")
         img_2 = img.resize((100, 100))
-        img_2.save(f"images/{newImageId}/100x100.png")
+        img_2.save(f"image_db/{newImageId}/100x100.png")
         img_3 = img.resize((100, 100))
-        img_3.save(f"images/{newImageId}/75x75.png")
+        img_3.save(f"image_db/{newImageId}/75x75.png")
         img_4 = img.resize((75, 75))
-        img_4.save(f"images/{newImageId}/50x50.png")
+        img_4.save(f"image_db/{newImageId}/50x50.png")
       self.item["imageId"] = newImageId
     elif self.item["imageId"] == "":
       self.messageBox("Invalid Image", message="Please upload an image for this product")
