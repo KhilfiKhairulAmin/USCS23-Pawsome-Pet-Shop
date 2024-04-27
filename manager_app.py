@@ -25,8 +25,9 @@ class ManagerDashboard(EasyFrame):
 
     start_row = 1
     self.sidePanel = self.addPanel(0, 0, rowspan=len(orders)+start_row, background="white")
-    self.sidePanel.addButton("Manage Products", 1, 0, rowspan=2, command=self.manageProducts)
-    self.sidePanel.addButton("Analytics", 3, 0, command=self.analytics)
+    self.sidePanel.addButton("Manage Products", 1, 0, command=self.manageProducts)
+    self.sidePanel.addButton("Feedbacks", 2, 0, command=self.feedbacks)
+    self.sidePanel.addButton("Ratings", 3, 0, command=self.ratings)
     self.img = self.sidePanel.addLabel("", 0, 0, sticky="NSEW")
     img = tk.PhotoImage(file="images/cat logo200x200transparent.png", height=200, width=200)
     self.img["image"] = img
@@ -57,6 +58,20 @@ class ManagerDashboard(EasyFrame):
     saveOrders(orders)
     self.master.destroy()
     ManagerDashboard()
+
+  def feedbacks(self):
+    with open('db/feedback.txt', 'r') as f:
+      feedback = ""
+      for line in f:
+        feedback += line
+      self.messageBox("Feedbacks", feedback, width=50, height=50)
+
+  def ratings(self):
+    with open('db/rating.txt', 'r') as f:
+      rating = ""
+      for line in f:
+        rating += line
+      self.messageBox("Ratings", rating, width=50, height=50)
 
   def manageProducts(self):
     self.master.destroy()
