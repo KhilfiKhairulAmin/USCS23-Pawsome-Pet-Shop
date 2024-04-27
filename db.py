@@ -9,7 +9,7 @@ def loadOrders():
   with open('db/orders.txt') as file:
     next(file)  # Skip data header
     for line in file:
-      (id, userId, address, datetime, status) = line.split(',')  
+      (id, userId, address, datetime, status) = line.split('|')  
       
       orders.append({
         "id": id,
@@ -23,10 +23,10 @@ def loadOrders():
 
 
 def saveOrders(orders: list[dict]):
-  header = "id,userId,address,datetime,status"
+  header = "id|userId|address|datetime|status"
   raw_data = header + '\n'
   for order in orders:
-    raw_data += f'{order["id"]},{order["userId"]},{order["address"]},{order["datetime"]},{order["status"]}\n'
+    raw_data += f'{order["id"]}|{order["userId"]}|{order["address"]}|{order["datetime"]}|{order["status"]}\n'
 
   with open('db/orders.txt', 'w') as file:
     file.write(raw_data)

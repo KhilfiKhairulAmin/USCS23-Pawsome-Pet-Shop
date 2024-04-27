@@ -17,8 +17,8 @@ id,imageId,name,price,unit,sold,totalStars,type
 16,63,Cat shampoo,15.0,15,0,0,hygiene
 17,64,Toothbrush,11.0,10,0,0,hygiene
 18,65,Litter scoop,10.0,11,0,0,hygiene
-19,66,Spring toy,15.0,10,0,0,toys
+19,66,Spring toy,15.0,8,2,0,toys
 20,67,Balls,5.0,10,0,0,toys
 21,68,Feather wand,7.0,15,0,0,toys
 22,69,Chew toy,10.0,15,0,0,toys
-23,70,Mouse toy,17.0,20,0,0,toys
+23,70,Mouse toy,17.0,16,4,0,toys
