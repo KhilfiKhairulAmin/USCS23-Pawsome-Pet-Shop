@@ -188,12 +188,10 @@ class ProductManagement(EasyFrame, tk.Toplevel):
     ProductManagement(search=self.search.getText(), pagination=number)
 
   def delete(self, item):
-    def deleteProduct(item):
-      products.pop(products.index(item))
-      saveProducts(products)
-      ProductManagement().mainloop()
-  
-    Modal("Delete Product", lambda item=item: deleteProduct(item))
+    products.pop(products.index(item))
+    saveProducts(products)
+    self.master.destroy()
+    ProductManagement()
 
 
 class ProductEditMenu(EasyFrame, tk.Toplevel):
@@ -367,15 +365,6 @@ class ProductEditMenu(EasyFrame, tk.Toplevel):
     saveProducts(products)
     self.parent.master.destroy()
     ProductManagement()
-
-
-class Modal(EasyFrame, tk.Toplevel):
-  def __init__(self, title="", command=lambda : None):
-    EasyFrame.__init__(self, title)
-    tk.Toplevel.__init__(self)
-    self.addLabel("Are you sure?", 0, 0, columnspan=2)
-    self.addButton("Cancel", 1, 0)
-    self.addButton("Yes", 1, 1, command=command)
 
 
 def main():

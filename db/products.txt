@@ -1,7 +1,24 @@
 id,imageId,name,price,unit,sold,totalStars,type
-3,70,re4,99000999.0,10,0,0,medicine
-4,64,uu,0.0,0,0,0,medicine
-5,65,7y,0.0,0,0,0,hygiene
-6,66,hhh,0.0,0,0,0,toys
-7,67,fnaf,0.0,0,0,0,toys
-8,69,kkkk,0.0,0,0,0,medicine
+11,48,Whiskas wetfood,20.0,25,0,0,food
+12,49,Smart Heart wetfood,15.0,20,0,0,food
+13,50,Prodiet wetfood,25.0,25,0,0,food
+14,51,Snappy Tom dryfood,35.0,10,0,0,food
+15,52,Hills dryfood,30.0,20,0,0,food
+16,53,IAMSO dryfood ,30.0,15,0,0,food
+17,54,wound spray,15.0,15,0,0,medicine
+18,55,PurrScription PLUS,17.0,10,0,0,medicine
+19,56,NATURAL antibiotic,20.0,0,0,0,medicine
+20,57,WORMER,18.0,10,0,0,medicine
+21,58,Revolution PLUS,20.0,18,0,0,medicine
+22,59,Flea Treatment,20.0,21,0,0,medicine
+23,60,Brush,10.0,15,0,0,hygiene
+24,61,Nail clipper,5.0,13,0,0,hygiene
+25,62,Litter box,25.0,10,0,0,hygiene
+26,63,Cat shampoo,15.0,15,0,0,hygiene
+27,64,Toothbrush,11.0,10,0,0,hygiene
+28,65,Litter scoop,10.0,11,0,0,hygiene
+29,66,Spring toy,15.0,10,0,0,toys
+30,67,Balls,5.0,10,0,0,toys
+31,68,Feather wand,7.0,15,0,0,toys
+32,69,Chew toy,10.0,15,0,0,toys
+33,70,Mouse toy,17.0,20,0,0,toys

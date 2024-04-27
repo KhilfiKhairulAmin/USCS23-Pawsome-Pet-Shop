@@ -1,10 +1,11 @@
 from tkinter import *
 from tkinter import messagebox
-from db import loadUsers, saveUsers
+from db import loadUsers, saveUsers, loadProducts, saveSession
 from catalogue import shopCatalogue
 
 show = Tk()
 users = loadUsers()
+cartNum = str(int(loadProducts()[-1]["id"])+1)
 
 #screen
 show.title('LOGIN PAGE')
@@ -29,7 +30,8 @@ def signin():
     if valid_credentials:
         show.destroy()
         #app
-        shopCatalogue(uid).mainloop()
+        saveSession(uid, cartNum)
+        shopCatalogue().mainloop()
         return
 
     elif username=="" or password=="":

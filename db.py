@@ -5,6 +5,26 @@ Perform database operations for reading, and saving data from all text file.
 """
 
 
+def saveTempOrder(cartN, cart: dict):
+  with open(f"db/{cartN}.txt", 'w') as f:
+    raw = ""
+    for (k, v) in cart.items():
+      raw += f"{k},{v['price']},{v['quantity']}\n"
+    f.write(raw)
+
+
+def loadTempOrder(cartN):
+  cart = {}
+  with open(f"db/{cartN}.txt", 'r') as f:
+    for line in f:
+      k, p, q = line.split(",")
+      cart[k] = {
+        "quantity": q,
+        "price": p
+      }
+  return cart
+
+
 def loadOrders():
   orders: list[dict] = []
   with open('db/orders.txt') as file:
