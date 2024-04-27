@@ -7,7 +7,7 @@ id,imageId,name,price,unit,sold,totalStars,type
 16,53,IAMSO dryfood ,30.0,15,0,0,food
 17,54,wound spray,15.0,15,0,0,medicine
 18,55,PurrScription PLUS,17.0,10,0,0,medicine
-19,56,NATURAL antibiotic,20.0,0,0,0,medicine
+19,56,NATURAL antibiotic,20.0,20,0,0,medicine
 20,57,WORMER,18.0,10,0,0,medicine
 21,58,Revolution PLUS,20.0,18,0,0,medicine
 22,59,Flea Treatment,20.0,21,0,0,medicine

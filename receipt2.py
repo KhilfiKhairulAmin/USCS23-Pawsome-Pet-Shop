@@ -55,4 +55,5 @@ def receipt():
 b = Button(base, text="Print receipt", command=receipt)
 b.pack(padx=10, pady=10)
 
+
 base.mainloop()
