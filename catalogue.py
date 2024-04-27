@@ -5,6 +5,7 @@ from tkinter.font import Font
 from tkinter import *
 from db import loadSession
 
+
 uid, cartNumber = loadSession()
 
 

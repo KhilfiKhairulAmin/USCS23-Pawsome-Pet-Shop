@@ -1,8 +1,7 @@
 """
-Program: our_project.py
-Author: Khilfi, Murfiqah, Zainatul
-No description.
+Program: app.py
+Author: Khilfi
+This is the entry-point of the user application.
 """
-
 
 
