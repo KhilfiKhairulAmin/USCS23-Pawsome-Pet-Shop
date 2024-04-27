@@ -300,13 +300,30 @@ class StarRating(Frame):
             self.callback(idx + 1)
             messagebox.showinfo("Rating", "You rated: {} stars.\nThank you for the ratings!".format(idx + 1)) #rating is 1-based, callback will pop up the message box when star is click 
             self.saveRatings(idx + 1)  # Call saveRatings with the rating
+            self.destroy()
 
     def saveRatings(self, rating):
         with open("db/rating.txt", 'a') as file: #add the ratings in a rating file
-            file.write("Product is rated {}\n ".format(rating))
+            file.write(f"#{UID} rated {rating} STARS")
+        Feedback()
 
     def updateRating(rating):
         print("You rated:", rating)
+
+
+class Feedback(EasyFrame, Toplevel):
+    def __init__(self):
+        EasyFrame.__init__(self, title="Feedback Counter", width=300, height=100)
+        Toplevel.__init__(self)
+        self.label = self.addLabel(text="Incoming feedback...", row=0, column=0, sticky="NSEW")
+        self.feedback = self.prompterBox(title="Customer Feedback", promptString="Drop your feedbacks here!")
+        self.label["text"] = "Thank you for your feedback!"
+        self.saveFeedback()
+        self.destroy()
+    
+    def saveFeedback(self):
+        with open("db/feedback.txt", 'a') as file: 
+            file.write(self.feedback + '\n')
 
         
 def main():

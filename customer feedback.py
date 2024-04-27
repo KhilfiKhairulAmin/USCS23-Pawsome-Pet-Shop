@@ -14,7 +14,7 @@ class PrompterBoxDemo(EasyFrame):
             self.label["text"] = "Thank you for your feedback!"  
     
     def saveFeedback(self):
-        with open("feedback.txt", 'a') as file: 
+        with open("db/feedback.txt", 'a') as file: 
             file.write(",".join(self.feedback_list) + " , ")
         self.feedback_list = [] #empty the list again
 
