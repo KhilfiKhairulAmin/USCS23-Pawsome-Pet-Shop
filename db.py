@@ -16,7 +16,7 @@ def loadOrders():
         "userId": userId,
         "address": address,
         "datetime": datetime,
-        "status": True if status == "True" else False
+        "status": True if status.strip() == "True" else False
       })
   
   return orders

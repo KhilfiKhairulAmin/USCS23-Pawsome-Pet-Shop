@@ -12,7 +12,7 @@ id,imageId,name,price,unit,sold,totalStars,type
 21,58,Revolution PLUS,20.0,18,0,0,medicine
 22,59,Flea Treatment,20.0,21,0,0,medicine
 23,60,Brush,10.0,15,0,0,hygiene
-24,61,Nail clipper,5.0,13,0,0,hygiene
+24,61,Nail clipper,5.0,11,2,0,hygiene
 25,62,Litter box,25.0,10,0,0,hygiene
 26,63,Cat shampoo,15.0,15,0,0,hygiene
 27,64,Toothbrush,11.0,10,0,0,hygiene

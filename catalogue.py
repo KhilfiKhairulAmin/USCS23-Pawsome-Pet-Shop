@@ -8,7 +8,7 @@ import datetime
 from breezypythongui import EasyFrame
 from tkinter import *
 from tkinter.font import Font
-from db import loadOrders, loadSession, loadProducts, saveOrders
+from db import loadOrders, loadSession, loadProducts, saveOrders, saveProducts
 from tkinter import messagebox
 
 
@@ -277,8 +277,13 @@ class Checkout(EasyFrame, Toplevel):
 
         # Update stock quantity
         for k in Cart.keys():
-            Cart[k]['unit'] -= Cart[k]['quantity']   
-        
+            index = Products.index(Cart[k])
+            Cart[k]['unit'] -= Cart[k]['quantity']
+            Cart[k]['sold'] += Cart[k]['quantity']
+            Products[index] = Cart[k]
+        saveProducts(Products)
+            
+
         # Save order
         Orders = loadOrders()
         Orders.append({
@@ -289,6 +294,7 @@ class Checkout(EasyFrame, Toplevel):
             "status": False
         })
         saveOrders(Orders)
+
 
         # Set up new order
         CARTNUMBER = str(int(CARTNUMBER)+1)

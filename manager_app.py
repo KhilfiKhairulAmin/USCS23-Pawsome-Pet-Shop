@@ -1,4 +1,4 @@
-from breezypythongui import EasyFrame, EasyPanel
+from breezypythongui import EasyFrame
 import tkinter as tk
 import tkinter.filedialog
 from PIL import Image
@@ -10,6 +10,7 @@ import time
 products = loadProducts()
 orders = loadOrders()
 font = ("Verdana", 10, "bold")
+font2 = ("Verdana", 12, "bold")
 
 class ManagerDashboard(EasyFrame):
   def __init__(self):
@@ -19,6 +20,7 @@ class ManagerDashboard(EasyFrame):
     temp = orders.copy()
     temp.reverse()
     temp = list(filter(lambda x: not x["status"], temp))
+
     self.setBackground("#3f3a3c")
 
     start_row = 1
@@ -34,32 +36,27 @@ class ManagerDashboard(EasyFrame):
       self.addLabel("There are no orders currently.", 0, 1, sticky="NSEW", background="#3f3a3c", foreground="white")
       return
 
-    self.addLabel("Order ID", 0, 1, sticky="NES", background="#3f3a3c", foreground="white")
-    self.addLabel("Datetime", 0, 2, sticky="NEWS", background="#3f3a3c", foreground="white")
-    self.addLabel("Product", 0, 3, sticky="NEWS", background="#3f3a3c", foreground="white")
-    self.addLabel("Quantity", 0, 4, sticky="NEWS", background="#3f3a3c", foreground="white")
-    self.addLabel("Price", 0, 5, sticky="NEWS", background="#3f3a3c", foreground="white")
-    self.addLabel("Total Price", 0, 6, sticky="NEWS", background="#3f3a3c", foreground="white")
-    self.addLabel("Action", 0, 7, sticky="NEWS", background="#3f3a3c", foreground="white")
+    self.addLabel("No.", 0, 1, sticky="NES", background="#3f3a3c", foreground="white", font=font2)
+    self.addLabel("Payment", 0, 2, sticky="NES", background="#3f3a3c", foreground="white", font=font2)
+    self.addLabel("Address", 0, 3, sticky="NEWS", background="#3f3a3c", foreground="white", font=font2)
+    self.addLabel("Datetime", 0, 4, sticky="NEWS", background="#3f3a3c", foreground="white", font=font2)
+    self.addLabel("Action", 0, 5, sticky="NEWS", background="#3f3a3c", foreground="white", font=font2)
 
     for i in range(len(temp)):
       order = temp[i]
       j = i + start_row
-      product = list(filter(lambda x: x["id"] == order["productId"], products))[0]
-      # text = f"Order#{order['id']}\nDatetime: {order['datetime']}\nTotal Price: RM{'%.2f' % (order['price']*order['quantity'])}\nProduct: {product['name']}"
-      self.addLabel(order["id"], j, 1, sticky="NSE", background="#3f3a3c", foreground="white")
-      self.addLabel(order["datetime"], j, 2, sticky="NSEW", background="#3f3a3c", foreground="white")
-      self.addLabel(order["productId"], j, 3, sticky="NSEW", background="#3f3a3c", foreground="white")
-      self.addLabel(order["quantity"], j, 4, sticky="NSEW", background="#3f3a3c", foreground="white")
-      self.addLabel(order["price"], j, 5, sticky="NSEW", background="#3f3a3c", foreground="white")
-      self.addLabel(f"RM{'%.2f' % (order['price']*order['quantity'])}", j, 6, sticky="NSEW", background="#3f3a3c", foreground="white")
-      self.addButton("Deliver", j, 7, command=lambda pos=i: self.deliver(pos)).config(foreground="white", background="gray")
+      self.addLabel(i+1, j, 1, sticky="NSE", background="#3f3a3c", foreground="white", font=font2)
+      self.addLabel("Auto Debit Transfer", j, 2, sticky="NSE", background="#3f3a3c", foreground="white", font=font2)
+      self.addLabel(order["address"], j, 3, sticky="NSEW", background="#3f3a3c", foreground="white", font=font2)
+      self.addLabel(order["datetime"], j, 4, sticky="NSEW", background="#3f3a3c", foreground="white", font=font2)
+      self.addButton("Deliver", j, 5, command=lambda pos=temp[i]: self.deliver(pos)).config(foreground="white", background="gray", font=font2)
 
   def deliver(self, pos):
-    orders[pos]["status"] = True
+    index = orders.index(pos)
+    orders[index]['status'] = True
     saveOrders(orders)
     self.master.destroy()
-    ManagerDashboard().mainloop()
+    ManagerDashboard()
 
   def manageProducts(self):
     self.master.destroy()
@@ -107,7 +104,7 @@ class ProductManagement(EasyFrame, tk.Toplevel):
     self.page = pagination
     self.imgs = []  # used to store image_db reference because if not stored, it will get destroyed from memory
     self.shopLogo = self.addLabel("", row=0, column=0, columnspan=2, sticky="NSEW")
-    logo = tk.PhotoImage(file="cat logo200x200.png", width=200, height=200)
+    logo = tk.PhotoImage(file="images/cat logo200x200.png", width=200, height=200)
     self.shopLogo["image"] = logo
     self.imgs.append(logo)
 
@@ -169,9 +166,6 @@ class ProductManagement(EasyFrame, tk.Toplevel):
       self.addLabel(price, row=i, column=3, sticky="NSEW", font=font, background=bg)
       self.addLabel(product["unit"], row=i, column=4, sticky="NSEW", font=font, background=bg)
       self.addLabel(product["sold"], row=i, column=5, sticky="NSEW", font=font, background=bg)
-  
-  def __del__(self):
-    ManagerDashboard().mainloop()
 
   def edit(self, item):
     ProductEditMenu(self, item)
@@ -206,6 +200,7 @@ class ProductEditMenu(EasyFrame, tk.Toplevel):
       "price": 0,
       "unit": 0,
       "sold": 0,
+      "totalStars": 0,
       "type": "food"
       }
     else:
@@ -286,7 +281,7 @@ class ProductEditMenu(EasyFrame, tk.Toplevel):
     with Image.open(filePath) as tempImg:
       # Store image temporarily under `temp` folder
       tempImg = tempImg.resize((200, 200))
-      tempFile = f"temp/{time.time()}.png"
+      tempFile = f"cache/{time.time()}.png"
       tempImg.save(tempFile)
 
     # Replace picture
