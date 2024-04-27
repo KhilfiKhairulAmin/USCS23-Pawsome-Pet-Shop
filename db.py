@@ -23,7 +23,7 @@ def loadOrders():
 
 
 def saveOrders(orders: list[dict]):
-  header = "id,userId,address,datetime,status,productId,quantity,price"
+  header = "id,userId,address,datetime,status"
   raw_data = header + '\n'
   for order in orders:
     raw_data += f'{order["id"]},{order["userId"]},{order["address"]},{order["datetime"]},{order["status"]}\n'
