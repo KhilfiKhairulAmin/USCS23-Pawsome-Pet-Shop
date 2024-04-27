@@ -8,6 +8,7 @@ from breezypythongui import EasyFrame
 from tkinter import *
 from tkinter.font import Font
 from db import loadSession, loadProducts
+from tkinter import messagebox
 
 
 # Global variables to store products, user ID, cart number, and cart items
@@ -249,14 +250,15 @@ class Checkout(EasyFrame, Toplevel):
         rating_window.title("Give Rating")
 
         # Create and pack the StarRating widget in the rating window
-        rating_frame = StarRating(rating_window, numStars=5, callback=lambda rating: self.on_rating_submit(rating))
+        rating_frame = StarRating(rating_window, numStars=5, callback=lambda rating: self.on_rating_submit(rating_window, rating))
         rating_frame.pack(pady=20)
 
-    def on_rating_submit(self, rating):
-        print("You rated:", self)
+    @staticmethod
+    def on_rating_submit(parent, rating):
+        print("You rated:", rating)
 
         # Close the parent window (receipt window)
-        self.destroy()
+        parent.destroy()
 
     def pay(self):
         self.messageBox("Payment Successful!", message="Thank you for ordering with us! Your order is on its way ^..^")
@@ -267,74 +269,44 @@ class Checkout(EasyFrame, Toplevel):
         self.parent().mainloop()
 
 
-from tkinter import *
-from starRating import StarRating  # Import your StarRating class from the starRating module
+class StarRating(Frame):
+    def __init__(self, master=None, numStars=5, callback=None):
+        super().__init__(master)
+        self.master = master
+        self.numStars = numStars
+        self.callback = callback #function to call when rating is selected
+        self.createWidgets()
 
-def receipt():
-    top = Toplevel()
-    top.geometry("400x400")
-    top.config(background="sky blue")
+    def createWidgets(self):
+        self.stars = []
+        for i in range(self.numStars):
+            star = Label(self, text="⭐", font=("Arial", 20))
+            star.bind("<Enter>", lambda event, idx=i: self.on_enter(idx)) #set a default value 'i' for the 'idx' param. then 'idx' will capture the current value of i when lambda is defined
+            star.bind("<Leave>", lambda event, idx=i: self.on_leave(idx))
+            star.bind("<Button-1>", lambda event, idx=i: self.on_click(idx))
+            star.grid(row=0, column=i)
+            self.stars.append(star)
 
-    # Display receipt header
-    header_label = Label(top, text="--- PAWSOME PURCHASE RECEIPT ---", bg="sky blue")
-    header_label.pack(side=TOP)
+    def on_enter(self, idx): #stars change color when the mouse about to click
+        for i in range(idx + 1):
+            self.stars[i].config(fg="orange")
 
-    orders = [
-        {"company": "Whiskas", "name": "Dry Food", "price": 10.0, "unit": 2, "total": 20.0},
-        {"company": "Royal Canin", "name": "Dry Food", "price": 15.0, "unit": 3, "total": 45.0},
-        {"company": "Snappy Tom", "name": "Wet Food", "price": 20.0, "unit": 1, "total": 20.0}
-    ]
+    def on_leave(self, idx): #stars change color when the mouse about to leave
+        for i in range(idx + 1):
+            self.stars[i].config(fg="black")
 
-    total_cost = 0
+    def on_click(self, idx):
+        if self.callback:
+            self.callback(idx + 1)
+            messagebox.showinfo("Rating", "You rated: {} stars.\nThank you for the ratings!".format(idx + 1)) #rating is 1-based, callback will pop up the message box when star is click 
+            self.saveRatings(idx + 1)  # Call saveRatings with the rating
 
-    # Create a frame to display the receipt in a table-like format
-    receipt_frame = Frame(top, bg="sky blue")
-    receipt_frame.pack(fill=BOTH, expand=True)
+    def saveRatings(self, rating):
+        with open("db/rating.txt", 'a') as file: #add the ratings in a rating file
+            file.write("Product is rated {}\n ".format(rating))
 
-    # Display table headers
-    headers = ["NAME", "PRICE", "UNIT", "TOTAL"]
-    for i, header in enumerate(headers):
-        header_label = Label(receipt_frame, text=header, bg="sky blue")
-        header_label.grid(row=0, column=i, padx=5, pady=5)
-
-    # Display each product in a row
-    for idx, order in enumerate(orders):
-        name = order['name']
-        price = float(order['price'])
-        unit = int(order['unit'])
-        total = price * unit
-        total_cost += total
-
-        # Display product details in corresponding columns
-        product_details = [name, f"${price:.2f}", unit, f"${total:.2f}"]
-        for col, detail in enumerate(product_details):
-            detail_label = Label(receipt_frame, text=detail, bg="sky blue")
-            detail_label.grid(row=idx + 1, column=col, padx=5, pady=5)
-
-    tax = 0.1 * total_cost
-    overall_cost = tax + total_cost
-
-    # Display total cost
-    total_label = Label(top, text=f"Total cost: ${(overall_cost - tax):.2f}\n10 % tax: ${tax:.2f}\nOverall cost = ${overall_cost}\nThank you for purchasing with us!", bg="sky blue")
-    total_label.pack()
-
-    # Button to open the star rating window
-    rating_button = Button(top, text="Give Rating", command=lambda: open_rating_window(top))
-    rating_button.pack(pady=10)
-
-def open_rating_window(parent):
-    rating_window = Toplevel()
-    rating_window.title("Give Rating")
-
-    # Create and pack the StarRating widget in the rating window
-    rating_frame = StarRating(rating_window, numStars=5, callback=lambda rating: on_rating_submit(rating, parent))
-    rating_frame.pack(pady=20)
-
-def on_rating_submit(rating, parent):
-    print("You rated:", rating)
-
-    # Close the parent window (receipt window)
-    parent.destroy()
+    def updateRating(rating):
+        print("You rated:", rating)
 
         
 def main():
