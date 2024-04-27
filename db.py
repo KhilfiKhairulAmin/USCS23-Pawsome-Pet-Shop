@@ -4,43 +4,19 @@ Author: Khilfi, Murfiqah, Zainatul
 Perform database operations for reading, and saving data from all text file.
 """
 
-
-def saveTempOrder(cartN, cart: dict):
-  with open(f"db/{cartN}.txt", 'w') as f:
-    raw = ""
-    for (k, v) in cart.items():
-      raw += f"{k},{v['price']},{v['quantity']}\n"
-    f.write(raw)
-
-
-def loadTempOrder(cartN):
-  cart = {}
-  with open(f"db/{cartN}.txt", 'r') as f:
-    for line in f:
-      k, p, q = line.split(",")
-      cart[k] = {
-        "quantity": q,
-        "price": p
-      }
-  return cart
-
-
 def loadOrders():
   orders: list[dict] = []
   with open('db/orders.txt') as file:
     next(file)  # Skip data header
     for line in file:
-      (id, userId, address, datetime, status, productId, quantity, price) = line.split(',')  
+      (id, userId, address, datetime, status) = line.split(',')  
       
       orders.append({
         "id": id,
         "userId": userId,
         "address": address,
         "datetime": datetime,
-        "status": True if status == "True" else False,
-        "productId": productId,
-        "quantity": int(quantity),
-        "price": float(price)
+        "status": True if status == "True" else False
       })
   
   return orders
@@ -50,7 +26,7 @@ def saveOrders(orders: list[dict]):
   header = "id,userId,address,datetime,status,productId,quantity,price"
   raw_data = header + '\n'
   for order in orders:
-    raw_data += f'{order["id"]},{order["userId"]},{order["address"]},{order["datetime"]},{order["status"]},{order["productId"]},{order["quantity"]},{order["price"]}\n'
+    raw_data += f'{order["id"]},{order["userId"]},{order["address"]},{order["datetime"]},{order["status"]}\n'
 
   with open('db/orders.txt', 'w') as file:
     file.write(raw_data)
