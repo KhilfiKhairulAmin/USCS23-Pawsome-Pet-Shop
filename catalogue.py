@@ -374,7 +374,7 @@ class Feedback(EasyFrame, Toplevel):
     
     def saveFeedback(self):
         with open("db/feedback.txt", 'a') as file: 
-            file.write(self.feedback + '\n')
+            file.write(f"#{UID}: {self.feedback}\n\n")
         self.messageBox("Payment Successful!", message="Thank you for ordering with us! Your order is on its way ^..^")
 
         
